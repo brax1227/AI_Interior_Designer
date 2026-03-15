@@ -1,0 +1,52 @@
+{
+  "geometry_version": 2,
+  "unit_name": "Mercer (approximate layout from image)",
+  "width_ft": 42,
+  "height_ft": 32,
+  "shell": {
+    "points": [
+      [0, 6],
+      [0, 28],
+      [8, 28],
+      [8, 26],
+      [14, 26],
+      [14, 32],
+      [42, 32],
+      [42, 19],
+      [39, 19],
+      [39, 14],
+      [42, 14],
+      [42, 6],
+      [30, 6],
+      [30, 0],
+      [14, 0],
+      [14, 6]
+    ]
+  },
+  "zones": [
+    { "name": "Bedroom", "type": "bedroom", "polygon": [[0, 6], [0, 18], [14, 18], [14, 6]] },
+    { "name": "Bathroom", "type": "bath", "polygon": [[0, 18], [0, 28], [7.5, 28], [7.5, 22.5], [10.5, 19.5], [10.5, 18]] },
+    { "name": "Closet/Hall", "type": "closet", "polygon": [[7.5, 28], [14, 28], [14, 18], [10.5, 18], [10.5, 19.5], [7.5, 22.5]] },
+    { "name": "Dining", "type": "dining", "polygon": [[14, 18], [14, 27], [25.5, 27], [25.5, 18]] },
+    { "name": "Kitchen", "type": "kitchen", "polygon": [[25.5, 20], [31, 20], [35, 18], [39, 18], [39, 24], [35.5, 24], [35.5, 32], [25.5, 32]] },
+    { "name": "Laundry", "type": "utility", "polygon": [[35.5, 24], [42, 24], [42, 32], [35.5, 32]] },
+    { "name": "Office/Den", "type": "office", "polygon": [[14, 6], [14, 18], [23.5, 18], [27.5, 14.5], [27.5, 6]] },
+    { "name": "Living Room", "type": "living", "polygon": [[27.5, 6], [42, 6], [42, 14], [39, 14], [39, 19], [35, 19], [30.5, 17], [27.5, 14.5]] },
+    { "name": "Patio", "type": "outdoor", "polygon": [[14, 0], [30, 0], [30, 6], [14, 6]] }
+  ],
+  "openings": [
+    { "room_name": "Bedroom", "kind": "window", "edge_index": 0, "offset": 4.0, "width": 5.0 },
+    { "room_name": "Bedroom", "kind": "door", "edge_index": 2, "offset": 10.5, "width": 2.5 },
+    { "room_name": "Bathroom", "kind": "door", "edge_index": 4, "offset": 0.4, "width": 2.4 },
+    { "room_name": "Dining", "kind": "door", "edge_index": 1, "offset": 6.5, "width": 2.6 },
+    { "room_name": "Kitchen", "kind": "window", "edge_index": 6, "offset": 2.5, "width": 4.5 },
+    { "room_name": "Kitchen", "kind": "door", "edge_index": 2, "offset": 1.2, "width": 2.8 },
+    { "room_name": "Laundry", "kind": "door", "edge_index": 3, "offset": 2.5, "width": 2.5 },
+    { "room_name": "Office/Den", "kind": "window", "edge_index": 0, "offset": 4.0, "width": 6.0 },
+    { "room_name": "Office/Den", "kind": "door", "edge_index": 2, "offset": 0.8, "width": 2.8 },
+    { "room_name": "Office/Den", "kind": "door", "edge_index": 4, "offset": 5.2, "width": 4.0 },
+    { "room_name": "Living Room", "kind": "window", "edge_index": 0, "offset": 3.0, "width": 5.0 },
+    { "room_name": "Living Room", "kind": "window", "edge_index": 1, "offset": 1.5, "width": 4.0 },
+    { "room_name": "Living Room", "kind": "door", "edge_index": 2, "offset": 0.8, "width": 2.6 }
+  ]
+}
