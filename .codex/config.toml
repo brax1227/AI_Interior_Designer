@@ -1,0 +1,4 @@
+# Shared local defaults; loaded by Codex only after this project is trusted.
+# Session/CLI overrides and enforced workspace policies still apply.
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"
