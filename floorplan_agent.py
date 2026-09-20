@@ -63,8 +63,16 @@ class FloorPlan:
 
 
 def load_layout(path: Path) -> Dict:
+    if not path.exists():
+        raise FileNotFoundError(f"Layout file not found: {path}")
     with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        try:
+            layout = json.load(handle)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Layout file is not valid JSON: {path} (line {exc.lineno}, column {exc.colno})") from exc
+    if not isinstance(layout, dict):
+        raise ValueError(f"Layout file must contain a JSON object: {path}")
+    return layout
 
 
 def rectangle_polygon(x: float, y: float, w: float, h: float) -> List[Point]:

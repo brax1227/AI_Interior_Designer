@@ -1,0 +1,30 @@
+
+== mercer: POST /generate -> HTTP 200; run_dir=/outputs/run_20260920_210807_d30820; error=None
+   GET /outputs/run_20260920_210807_d30820/space_plan_report.md -> 200 3617 bytes
+   GET /outputs/run_20260920_210807_d30820/space_plan_report.json -> 200 8646 bytes
+   GET /outputs/run_20260920_210807_d30820/manifest.json -> 200 5349 bytes
+   GET /outputs/run_20260920_210807_d30820/dimensioned_plan.svg -> 200 20830 bytes
+   GET /outputs/run_20260920_210807_d30820/mercer_model.obj -> 200 66821 bytes
+   GET /outputs/run_20260920_210807_d30820/sheets/G001_cover_sheet.svg -> 200 8293 bytes
+   GET /outputs/run_20260920_210807_d30820/drawing_set_print.html -> 200 4736 bytes
+   checks: {'layout_geometry': 'pass', 'containment': 'pass', 'overlap': 'fail', 'door_clearance': 'pass', 'walkable_path': 'unmeasured'}
+   door_pass moves: 11 grouped: ['Desk', 'Desk Chair', 'Dryer', 'Washer'] unresolved: 0
+   md has 'walkable path | unmeasured': True | has desk-set row: True | has disclaimer: True
+   manifest space_plan_checks: {'layout_geometry': 'pass', 'containment': 'pass', 'overlap': 'fail', 'door_clearance': 'pass', 'walkable_path': 'unmeasured'} violations: 1
+   dimensioned_plan.svg dashed door zones: 12
+   cover sheet carries check line: True | old score text: False
+   GET /viewer -> 200 6313 bytes
+
+== infeasible group sample: POST /generate -> HTTP 200; run_dir=/outputs/run_20260920_210807_869730; error=None
+   md has UNRESOLVED line: True | door clearance fail: True
+   success page mentions failing checks or unresolved: True True
+
+== adversarial invalid layout: POST /generate -> HTTP 400; run_dir=None; error=Zone &#x27;Annex&#x27; extends outside the unit shell.
+
+== missing layout path: POST /generate -> HTTP 400; run_dir=None; error=Layout file not found: does_not_exist.json
+
+== non-JSON layout path: POST /generate -> HTTP 400; run_dir=None; error=Layout file is not valid JSON: README.md (line 1, column 1)
+
+== garbage style image upload: POST /generate -> HTTP 200; run_dir=/outputs/run_20260920_210807_e2feff; error=None
+
+== empty form: POST /generate -> HTTP 200; run_dir=/outputs/run_20260920_210807_71058c; error=None

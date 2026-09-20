@@ -2312,6 +2312,7 @@ def run_design(
     manifest = {
         "unit": plan.unit_name,
         "palette": palette,
+        "palette_from_images": bool(style_palette),
         "answers": answers,
         "space_plan_checks": {name: check["status"] for name, check in analysis_report["checks"].items()},
         "space_plan_modelled_violations": analysis_report["modelled_violation_count"],

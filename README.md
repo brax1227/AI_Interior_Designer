@@ -112,14 +112,25 @@ Outputs are written to `outputs/`:
 
 ## Local web app
 
-Start a local server with a simple form UI:
+Start a local server with a simple form UI (binds to loopback only by default;
+set `HOST`/`PORT` to change):
 
 ```bash
 python3 local_server.py
 ```
 
-Open `http://127.0.0.1:8000` and submit the form. Each run writes to
-`outputs/run_YYYYMMDD_HHMMSS/`.
+Open `http://127.0.0.1:8000` and submit the form. Each run writes to a unique
+`outputs/run_YYYYMMDD_HHMMSS_xxxxxx/` folder. The success page summarises the
+space-plan checks (including unresolved furniture groups and the unmeasured
+walkable-path field) before you open any download. Invalid layouts return HTTP 400
+with the reason and leave no run folder. The layout field is a path inside this
+workspace, not an upload.
+
+End-to-end test of the web flow on an ephemeral loopback port (cleans up after itself):
+
+```bash
+python3 -m unittest tests.test_local_server_e2e -v
+```
 
 After generation, click the **3D viewer** link to open an in-browser preview
 powered by Three.js.

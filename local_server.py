@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import html as html_lib
 import json
 import os
+import shutil
+import uuid
 from datetime import datetime
 from email.parser import BytesParser
 from email.policy import default
@@ -510,6 +513,7 @@ def render_success_page(
     notes_sheet_url: str,
     drawing_set_print_url: str,
     viewer_url: str,
+    checks_html: str = "",
 ) -> str:
     return f"""<!doctype html>
 <html lang="en">
@@ -636,6 +640,7 @@ def render_success_page(
         The agent created a new concept run with your latest inputs. Use the links below to review
         the 3D model, design brief, shopping outputs, and planning report.
       </p>
+      {checks_html}
       <div class="actions">
         <a class="action primary" href="{viewer_url}">
           <strong>Open 3D Viewer</strong>
@@ -1000,6 +1005,55 @@ def build_answers(fields: Dict[str, str]) -> Dict:
     }
 
 
+def resolve_layout_path(raw: str) -> Path:
+    """Only layout files inside this workspace can be used; the form is a path, not an upload."""
+    candidate = (BASE_DIR / (raw or "mercer_layout.json")).resolve()
+    if BASE_DIR not in candidate.parents:
+        raise ValueError(f"Layout path must be a file inside the workspace: {raw}")
+    # Relative to the workspace (the server's working directory) so messages stay readable.
+    return candidate.relative_to(BASE_DIR)
+
+
+def new_run_dir() -> Path:
+    """Unique per request: two submissions in the same second must not overwrite each other."""
+    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+    while True:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        candidate = OUTPUTS_DIR / f"run_{stamp}_{uuid.uuid4().hex[:6]}"
+        try:
+            candidate.mkdir(parents=False, exist_ok=False)
+        except FileExistsError:
+            continue
+        return candidate
+
+
+def render_checks_summary(report: Dict, style_note: str | None) -> str:
+    checks = report.get("checks", {})
+    rows = "".join(
+        f"<li><strong>{name.replace('_', ' ')}</strong>: {check['status']}"
+        + (f" ({check['finding_count']} finding(s))" if check.get("finding_count") else "")
+        + "</li>"
+        for name, check in checks.items()
+    )
+    unresolved = report.get("door_pass", {}).get("unresolved", [])
+    unresolved_html = "".join(
+        f"<li><strong>Unresolved:</strong> {' + '.join(entry['members'])} in {entry['room']} still blocks the {entry['door_room']} door.</li>"
+        for entry in unresolved
+    )
+    style_html = f"<li><strong>Style images:</strong> {style_note}</li>" if style_note else ""
+    violations = report.get("modelled_violation_count", 0)
+    headline = (
+        "All modelled checks passed." if not violations else f"{violations} modelled violation(s) found. Open the report before using this plan."
+    )
+    return (
+        '<div class="checks" style="margin:0 0 20px;padding:14px 16px;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;">'
+        f"<p style=\"margin:0 0 8px;font-weight:600;\">{headline}</p>"
+        f'<ul style="margin:0;padding-left:18px;">{rows}{unresolved_html}{style_html}</ul>'
+        f'<p style="margin:8px 0 0;font-size:0.9em;color:#475569;">{report.get("disclaimer", "")}</p>'
+        "</div>"
+    )
+
+
 class DesignHandler(SimpleHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path == "/" or self.path.startswith("/index"):
@@ -1032,15 +1086,26 @@ class DesignHandler(SimpleHTTPRequestHandler):
             self.send_error(404, "Not Found")
             return
 
+        status = 200
+        out_dir: Path | None = None
         try:
             fields, files = parse_form(self)
             answers = build_answers(fields)
-            layout_path = Path(fields.get("layout", "mercer_layout.json"))
+            layout_path = resolve_layout_path(fields.get("layout", "mercer_layout.json"))
             style_images = save_uploads(files)
 
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            out_dir = OUTPUTS_DIR / f"run_{timestamp}"
-            run_design(layout_path, answers, style_images, out_dir)
+            out_dir = new_run_dir()
+            manifest = run_design(layout_path, answers, style_images, out_dir)
+            report = json.loads((out_dir / "space_plan_report.json").read_text(encoding="utf-8"))
+            style_note = None
+            if style_images:
+                if not manifest.get("palette_from_images"):
+                    style_note = (
+                        f"{len(style_images)} file(s) uploaded but not used: Pillow is not installed or the files are not readable images. "
+                        "The default palette was used."
+                    )
+                else:
+                    style_note = f"{len(style_images)} file(s) used to infer the palette."
 
             obj_rel = out_dir.relative_to(BASE_DIR) / "mercer_model.obj"
             mtl_rel = out_dir.relative_to(BASE_DIR) / "mercer_model.mtl"
@@ -1070,10 +1135,17 @@ class DesignHandler(SimpleHTTPRequestHandler):
                 f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'A601_notes_sheet.svg'}",
                 f"/{out_dir.relative_to(BASE_DIR) / 'drawing_set_print.html'}",
                 viewer_url,
+                render_checks_summary(report, style_note),
             )
-        except Exception as exc:
-            page = render_index(f"Generation failed: {exc}")
-        self.send_response(200)
+        except (FileNotFoundError, ValueError, KeyError) as exc:
+            status = 400
+            page = render_index(f"Generation failed: {html_lib.escape(str(exc))}")
+        except Exception as exc:  # unexpected: still tell the user, but flag it as a server error
+            status = 500
+            page = render_index(f"Generation failed (unexpected error): {type(exc).__name__}: {html_lib.escape(str(exc))}")
+        if status != 200 and out_dir is not None and not (out_dir / "manifest.json").exists():
+            shutil.rmtree(out_dir, ignore_errors=True)  # do not leave half-written run folders behind
+        self.send_response(status)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(page.encode("utf-8"))))
         self.end_headers()
@@ -1082,7 +1154,8 @@ class DesignHandler(SimpleHTTPRequestHandler):
 
 def main() -> int:
     os.chdir(BASE_DIR)
-    host = os.environ.get("HOST", "0.0.0.0")
+    # Loopback only by default; this tool reads workspace files by path and is not hardened for remote use.
+    host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "8000"))
     print(f"Serving on http://{host}:{port}")
     with TCPServer((host, port), DesignHandler) as httpd:
