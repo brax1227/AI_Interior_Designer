@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880.0" height="680.0">
+<rect x="0.0" y="0.0" width="880.0" height="680.0" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" />
+<polygon points="20.0,540.0 20.0,100.0 180.0,100.0 180.0,140.0 300.0,140.0 300.0,20.0 860.0,20.0 860.0,280.0 800.0,280.0 800.0,380.0 860.0,380.0 860.0,540.0 620.0,540.0 620.0,660.0 300.0,660.0 300.0,540.0" fill="#ffffff" stroke="#475569" stroke-width="1.5" />
+<polygon points="20.0,540.0 20.0,300.0 300.0,300.0 300.0,540.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="138.0" y="420.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Bedroom</text>
+<polygon points="20.0,300.0 20.0,100.0 170.0,100.0 170.0,210.0 230.0,270.0 230.0,300.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="83.7" y="207.2" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Bathroom</text>
+<polygon points="170.0,100.0 180.0,100.0 180.0,140.0 300.0,140.0 300.0,300.0 230.0,300.0 230.0,270.0 170.0,210.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="219.8" y="208.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Closet/Hall</text>
+<polygon points="300.0,300.0 300.0,120.0 530.0,120.0 530.0,300.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="393.0" y="210.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Dining</text>
+<polygon points="530.0,260.0 640.0,260.0 720.0,300.0 800.0,300.0 800.0,180.0 730.0,180.0 730.0,20.0 530.0,20.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="629.8" y="159.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Kitchen</text>
+<polygon points="730.0,180.0 860.0,180.0 860.0,20.0 730.0,20.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="773.0" y="100.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Laundry</text>
+<polygon points="300.0,540.0 300.0,300.0 490.0,300.0 570.0,370.0 570.0,540.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="408.1" y="424.4" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Office/Den</text>
+<polygon points="570.0,540.0 860.0,540.0 860.0,380.0 800.0,380.0 800.0,300.0 720.0,300.0 630.0,320.0 570.0,370.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="690.1" y="432.1" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Living Room</text>
+<polygon points="300.0,660.0 620.0,660.0 620.0,540.0 300.0,540.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="438.0" y="600.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Patio</text>
+<polygon points="17.5,460.0 17.5,360.0 22.5,360.0 22.5,460.0" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="302.5,316.0 302.5,366.0 297.5,366.0 297.5,316.0" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="210.0,302.5 162.0,302.5 162.0,297.5 210.0,297.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="430.0,117.5 482.0,117.5 482.0,122.5 430.0,122.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="680.0,22.5 590.0,22.5 590.0,17.5 680.0,17.5" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="744.0,297.5 800.0,297.5 800.0,302.5 744.0,302.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="802.0,177.5 852.0,177.5 852.0,182.5 802.0,182.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="297.5,460.0 297.5,340.0 302.5,340.0 302.5,460.0" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="503.7,308.7 545.8,345.5 542.5,349.3 500.4,312.4" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="466.0,542.5 386.0,542.5 386.0,537.5 466.0,537.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="630.0,537.5 730.0,537.5 730.0,542.5 630.0,542.5" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="857.5,510.0 857.5,430.0 862.5,430.0 862.5,510.0" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="856.0,382.5 804.0,382.5 804.0,377.5 856.0,377.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="300.0,366.0 350.0,366.0 350.0,316.0 300.0,316.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="250.0,366.0 300.0,366.0 300.0,316.0 250.0,316.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="162.0,348.0 210.0,348.0 210.0,300.0 162.0,300.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="162.0,300.0 210.0,300.0 210.0,252.0 162.0,252.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="430.0,172.0 482.0,172.0 482.0,120.0 430.0,120.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="744.0,300.0 800.0,300.0 800.0,244.0 744.0,244.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="744.0,356.0 800.0,356.0 800.0,300.0 744.0,300.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="802.0,180.0 852.0,180.0 852.0,130.0 802.0,130.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="465.2,389.6 544.2,389.6 544.2,310.5 465.2,310.5" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="386.0,600.0 466.0,600.0 466.0,540.0 386.0,540.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="386.0,540.0 466.0,540.0 466.0,460.0 386.0,460.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="804.0,432.0 856.0,432.0 856.0,380.0 804.0,380.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<rect x="110.0" y="350.0" width="100.0" height="134.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="114.0" y="364.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Queen Bed</text>
+<rect x="60.0" y="320.0" width="40.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="64.0" y="334.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Nightstand</text>
+<rect x="210.0" y="320.0" width="40.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="214.0" y="334.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Nightstand</text>
+<rect x="110.0" y="490.0" width="100.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="114.0" y="504.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Dresser</text>
+<rect x="36.0" y="252.0" width="56.0" height="32.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="40.0" y="266.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Bathroom Vanity</text>
+<rect x="116.0" y="120.0" width="30.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="120.0" y="134.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Toilet</text>
+<rect x="36.0" y="120.0" width="52.0" height="80.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="40.0" y="134.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Shower/Tub</text>
+<rect x="40.0" y="274.0" width="48.0" height="6.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="44.0" y="288.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Mirror Panel</text>
+<rect x="116.0" y="244.0" width="20.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="120.0" y="258.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Linen Tower</text>
+<rect x="370.0" y="175.0" width="90.0" height="90.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="374.0" y="189.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Dining Table</text>
+<rect x="605.0" y="135.0" width="120.0" height="50.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="609.0" y="149.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Island</text>
+<rect x="605.0" y="95.0" width="30.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="609.0" y="109.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Bar Stool</text>
+<rect x="645.0" y="95.0" width="30.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="649.0" y="109.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Bar Stool</text>
+<rect x="685.0" y="95.0" width="30.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="689.0" y="109.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Bar Stool</text>
+<rect x="546.0" y="30.0" width="140.0" height="20.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="550.0" y="44.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Kitchen Cabinet Run</text>
+<rect x="772.0" y="180.0" width="20.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="776.0" y="194.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Kitchen Cabinet Run</text>
+<rect x="700.0" y="216.0" width="40.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="704.0" y="230.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Fridge</text>
+<rect x="570.0" y="52.0" width="36.0" height="36.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="574.0" y="66.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Range</text>
+<rect x="630.0" y="50.0" width="52.0" height="32.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="634.0" y="64.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Sink Base</text>
+<rect x="546.0" y="26.0" width="120.0" height="14.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="550.0" y="40.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Upper Cabinets</text>
+<rect x="778.0" y="200.0" width="14.0" height="52.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="782.0" y="214.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Upper Cabinets</text>
+<rect x="746.0" y="112.0" width="52.0" height="52.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="750.0" y="126.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Washer</text>
+<rect x="806.0" y="77.0" width="52.0" height="52.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="810.0" y="91.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Dryer</text>
+<rect x="746.0" y="32.0" width="98.0" height="16.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="750.0" y="46.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Laundry Shelf</text>
+<rect x="746.0" y="34.0" width="98.0" height="10.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="750.0" y="48.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Wall Shelf</text>
+<rect x="305.0" y="480.0" width="80.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="309.0" y="494.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Desk</text>
+<rect x="410.0" y="420.0" width="40.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="414.0" y="434.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Desk Chair</text>
+<rect x="590.0" y="390.0" width="140.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="594.0" y="404.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Sofa</text>
+<rect x="746.0" y="466.0" width="30.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="750.0" y="480.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Coffee Table</text>
+<rect x="690.0" y="360.0" width="100.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="694.0" y="374.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">TV Console</text>
+<rect x="780.0" y="460.0" width="60.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="784.0" y="474.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Accent Chair</text>
+<rect x="380.0" y="560.0" width="160.0" height="80.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="384.0" y="574.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Outdoor Rug</text>
+<rect x="438.0" y="603.0" width="44.0" height="44.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="442.0" y="617.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Patio Table</text>
+<rect x="388.0" y="601.0" width="32.0" height="32.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="392.0" y="615.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Patio Chair</text>
+<rect x="500.0" y="586.0" width="32.0" height="32.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="504.0" y="600.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Patio Chair</text>
+<rect x="324.0" y="620.0" width="24.0" height="24.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="328.0" y="634.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Planter</text>
+</svg>

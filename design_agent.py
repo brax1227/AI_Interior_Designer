@@ -22,7 +22,17 @@ from floorplan_agent import (
     to_sheet_svg,
     to_svg,
 )
-from geometry import canonical_segment, point_in_polygon, polygon_area, polygon_centroid, segment_length, segments_from_polygon
+from plan_checks import (
+    find_door_conflicts,
+    find_furniture_outside_room,
+    find_opening_overruns,
+    find_zone_overlaps,
+    find_zone_shell_violations,
+    is_floor_item,
+    resolve_door_conflicts,
+    SOFT_SURFACE_NAMES,
+)
+from geometry import canonical_segment, polygon_area, polygon_centroid, segment_length, segments_from_polygon
 
 
 FURNITURE_HEIGHTS_FT = {
@@ -306,6 +316,10 @@ def validate_plan(plan: FloorPlan) -> None:
             raise ValueError(
                 f"Room '{room.name}' extends beyond the unit bounds."
             )
+    for problem in find_zone_shell_violations(plan):
+        raise ValueError(f"Zone '{problem['room']}' extends outside the unit shell.")
+    for problem in find_opening_overruns(plan):
+        raise ValueError(f"Opening in '{problem['room']}' {problem['message']}.")
 
 
 def hex_to_rgb(hex_color: str) -> Tuple[float, float, float]:
@@ -745,7 +759,7 @@ def furniture_box(item: Furniture) -> Tuple[float, float, float, float]:
 
 
 def is_soft_surface(item: Furniture) -> bool:
-    return item.name in {"Outdoor Rug"}
+    return item.name in SOFT_SURFACE_NAMES
 
 
 def material_cost_range(spec: Dict[str, object], budget_level: str) -> Tuple[int, int]:
@@ -769,6 +783,18 @@ def analyze_plan(plan: FloorPlan) -> Dict:
     issues: List[Dict[str, str]] = []
     room_stats: List[Dict[str, object]] = []
 
+    for problem in find_zone_overlaps(plan):
+        issues.append({"severity": "high", "room": " / ".join(problem["rooms"]), "message": problem["message"] + "."})
+    for problem in find_opening_overruns(plan):
+        issues.append({"severity": "high", "room": problem["room"], "message": problem["message"] + "."})
+    outside = {(problem["room"], problem["item"]) for problem in find_furniture_outside_room(plan)}
+    door_conflicts = find_door_conflicts(plan)
+    for conflict in door_conflicts:
+        issues.append({"severity": "high", "room": conflict["item_room"], "message": conflict["message"] + "."})
+    blocked_by_room: Dict[str, int] = {}
+    for conflict in door_conflicts:
+        blocked_by_room[conflict["item_room"]] = blocked_by_room.get(conflict["item_room"], 0) + 1
+
     for room in plan.rooms:
         room_items = [item for item in plan.furniture if item.room_name == room.name]
         room_box = (room.x, room.y, room.x + room.w, room.y + room.h)
@@ -776,15 +802,7 @@ def analyze_plan(plan: FloorPlan) -> Dict:
         overlap_violations = 0
 
         for item in room_items:
-            item_box = furniture_box(item)
-            corners = [
-                (item_box[0], item_box[1]),
-                (item_box[2], item_box[1]),
-                (item_box[2], item_box[3]),
-                (item_box[0], item_box[3]),
-                (item.x + item.w / 2, item.y + item.h / 2),
-            ]
-            if not all(point_in_polygon(corner, room.polygon) for corner in corners):
+            if (room.name, item.name) in outside:
                 issues.append(
                     {
                         "severity": "high",
@@ -819,8 +837,8 @@ def analyze_plan(plan: FloorPlan) -> Dict:
                 elif intersects(clearance_box(first), clearance_box(second)):
                     clearance_violations += 1
 
-        room_area = room.w * room.h
-        furniture_area = sum(item.w * item.h for item in room_items)
+        room_area = polygon_area(room.polygon)
+        furniture_area = sum(item.w * item.h for item in room_items if is_floor_item(item))
         free_area = max(room_area - furniture_area, 0.0)
         room_stats.append(
             {
@@ -832,6 +850,7 @@ def analyze_plan(plan: FloorPlan) -> Dict:
                 "item_count": len(room_items),
                 "clearance_warnings": clearance_violations,
                 "overlap_warnings": overlap_violations,
+                "door_conflicts": blocked_by_room.get(room.name, 0),
             }
         )
 
@@ -1031,7 +1050,8 @@ def write_analysis_report(report: Dict, out_json: Path, out_md: Path) -> None:
     for room in report["rooms"]:
         lines.append(
             f"- {room['room']}: free area {room['estimated_free_area_sqft']} sq ft, "
-            f"{room['item_count']} items, clearance warnings {room['clearance_warnings']}"
+            f"{room['item_count']} items, clearance warnings {room['clearance_warnings']}, "
+            f"door conflicts {room.get('door_conflicts', 0)}"
         )
     out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -1983,6 +2003,8 @@ def run_design(
     plan = build_plan(layout_path)
     validate_plan(plan)
     apply_design_preferences(plan, answers)
+    # Preference-driven pieces are added after the door-aware pass in build_plan.
+    resolve_door_conflicts(plan)
 
     style_palette = infer_palette_from_images(style_images or [])
     palette = ensure_palette(style_palette, answers["palette_preference"])

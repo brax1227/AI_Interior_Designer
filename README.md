@@ -10,7 +10,9 @@ openings for windows and doors.
 
 ## Assumptions used
 
-- Overall unit modeled as 42 ft x 26 ft (1,092 sq ft).
+- Overall unit modeled inside a 42 ft x 32 ft bounding box; the shell polygon in
+  `mercer_layout.json` encloses about 1,105 sq ft, of which about 1,020 sq ft is
+  assigned to named zones (the rest is circulation that no zone claims).
 - Room zones are approximated from the source plan image and preserve the visible
   adjacency relationships in the Mercer layout.
 - Door and window placements are conceptual and should be field-verified.
@@ -23,7 +25,27 @@ openings for windows and doors.
 python3 floorplan_agent.py --layout mercer_layout.json --out mercer_floorplan.svg
 ```
 
-Open `mercer_floorplan.svg` to view the output.
+Open `mercer_floorplan.svg` to view the output. Dashed amber boxes are door swing
+and approach clearances; rule-based furniture is slid out of them after placement.
+
+## Layout validity checks
+
+`plan_checks.py` holds deterministic geometry checks used by both agents:
+
+- openings must fit on their wall edge (`validate_plan` rejects overruns);
+- zones must lie inside the shell and must not overlap each other;
+- furniture must sit inside its room polygon (notches included);
+- floor-level furniture must not overlap or block a door's swing/approach zone.
+
+Failures that the door-aware pass cannot resolve are listed in
+`outputs/space_plan_report.md`. These are concept-plan sanity checks only, not
+code-compliance, egress, or structural verification.
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+See `docs/validation/` for a before/after sample of the checks on the Mercer layout.
 
 ## Customize
 

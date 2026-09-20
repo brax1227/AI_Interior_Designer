@@ -7,7 +7,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from geometry import Point, polygon_bounds, polygon_centroid, polygon_area, segments_from_polygon
+from geometry import Point, box_corners, polygon_bounds, polygon_centroid, polygon_area, segments_from_polygon
+from plan_checks import all_door_zones, opening_extent, resolve_door_conflicts
 
 
 @dataclass
@@ -293,10 +294,12 @@ def svg_text(
     )
 
 
-def svg_polygon(points: List[Point], fill: str, stroke: str) -> str:
+def svg_polygon(points: List[Point], fill: str, stroke: str, dashed: bool = False) -> str:
     path = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    dash = ' stroke-dasharray="4 3"' if dashed else ""
+    width = 1.0 if dashed else 1.5
     return (
-        f'<polygon points="{path}" fill="{fill}" stroke="{stroke}" stroke-width="1.5" />'
+        f'<polygon points="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{width}"{dash} />'
     )
 
 
@@ -314,30 +317,8 @@ def svg_circle(cx: float, cy: float, r: float, fill: str, stroke: str) -> str:
 
 
 def opening_span(room: Room, opening: Opening) -> Tuple[Point, Point, Point]:
-    edges = segments_from_polygon(room.polygon)
-    if opening.edge_index is not None and 0 <= opening.edge_index < len(edges):
-        start, end = edges[opening.edge_index]
-    else:
-        if opening.wall == "north":
-            start = (room.x, room.y + room.h)
-            end = (room.x + room.w, room.y + room.h)
-        elif opening.wall == "south":
-            start = (room.x, room.y)
-            end = (room.x + room.w, room.y)
-        elif opening.wall == "east":
-            start = (room.x + room.w, room.y)
-            end = (room.x + room.w, room.y + room.h)
-        else:
-            start = (room.x, room.y + room.h)
-            end = (room.x, room.y)
-    dx = end[0] - start[0]
-    dy = end[1] - start[1]
-    length = (dx * dx + dy * dy) ** 0.5 or 1.0
-    ux = dx / length
-    uy = dy / length
-    origin = (start[0] + ux * opening.offset, start[1] + uy * opening.offset)
-    far = (origin[0] + ux * opening.width, origin[1] + uy * opening.width)
-    return origin, far, (ux, uy)
+    """(origin, far, unit direction) of an opening along its wall edge; see plan_checks.opening_extent."""
+    return opening_extent(room, opening)
 
 
 def opening_segment(room: Room, opening: Opening) -> Tuple[Point, Point]:
@@ -958,6 +939,10 @@ def to_svg(plan: FloorPlan, out_path: Path, scale: float = 20.0, show_dimensions
         stroke = "#1d4ed8" if opening.kind == "window" else "#b45309"
         lines.append(svg_polygon(opening_points, fill, stroke))
 
+    for zone in all_door_zones(plan):
+        zone_points = to_svg_points(plan, list(box_corners(zone["box"])), scale, margin)
+        lines.append(svg_polygon(zone_points, "none", "#f59e0b", dashed=True))
+
     for item in plan.furniture:
         svg_x = margin + item.x * scale
         svg_y = margin + (plan.height_ft - (item.y + item.h)) * scale
@@ -1025,6 +1010,10 @@ def to_sheet_svg(
         fill = "#bfdbfe" if opening.kind == "window" else "#fde68a"
         stroke = "#2563eb" if opening.kind == "window" else "#b45309"
         lines.append(svg_polygon(opening_points, fill, stroke))
+
+    for zone in all_door_zones(plan):
+        zone_points = to_svg_points(plan, list(box_corners(zone["box"])), scale, margin)
+        lines.append(svg_polygon(zone_points, "none", "#f59e0b", dashed=True))
 
     for item in plan.furniture:
         svg_x = margin + item.x * scale
@@ -1140,7 +1129,11 @@ def build_plan(layout_path: Path) -> FloorPlan:
     layout = load_layout(layout_path)
     unit_name, width_ft, height_ft, shell, rooms, openings = build_rooms(layout)
     furniture = place_furniture(rooms)
-    return FloorPlan(unit_name, width_ft, height_ft, shell, rooms, openings, furniture)
+    plan = FloorPlan(unit_name, width_ft, height_ft, shell, rooms, openings, furniture)
+    # Rule-based placement ignores doors; slide anything that landed in a swing or
+    # approach zone. Unresolvable items stay put and are reported by analyze_plan.
+    resolve_door_conflicts(plan)
+    return plan
 
 
 def main() -> int:
