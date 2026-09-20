@@ -16,6 +16,7 @@ from plan_checks import find_door_conflicts  # noqa: E402
 
 MERCER = ROOT / "mercer_layout.json"
 RECT = ROOT / "samples" / "rect_two_room_layout.json"
+INFEASIBLE = ROOT / "samples" / "infeasible_group_layout.json"
 ADVERSARIAL = ROOT / "samples" / "adversarial_invalid_layout.json"
 HARD_CHECKS = ("layout_geometry", "containment", "overlap", "door_clearance")
 
@@ -91,31 +92,61 @@ class AdversarialSampleTests(unittest.TestCase):
     def test_unresolvable_conflicts_are_left_visible(self):
         self.assertEqual(self.info["raw_door_conflicts"], 2)
         self.assertEqual(self.info["door_pass_moves"], [])
+        self.assertEqual(len(self.info["door_pass_unresolved"]), 2)
         self.assertEqual(self.report["checks"]["door_clearance"]["finding_count"], 2)
+        self.assertEqual(len(self.report["door_pass"]["unresolved"]), 2)
 
 
-class KnownGroupingGapTests(unittest.TestCase):
-    """The door pass moves items one at a time; furniture groups can separate.
+def _gap_between(a, b) -> float:
+    gap_x = max(b.x - (a.x + a.w), a.x - (b.x + b.w), 0.0)
+    gap_y = max(b.y - (a.y + a.h), a.y - (b.y + b.h), 0.0)
+    return max(gap_x, gap_y)
 
-    These are recorded as expected failures so the gap stays visible in the test
-    output until grouping is implemented.
-    """
 
-    @unittest.expectedFailure
-    def test_desk_chair_stays_at_the_desk_on_mercer(self):
+class FurnitureGroupOnSamplesTests(unittest.TestCase):
+    """Formerly expectedFailure: groups now move as one unit on the real samples."""
+
+    def test_desk_chair_stays_at_the_desk_on_mercer_and_door_is_clear(self):
         plan = build_plan(MERCER)
         desk = next(item for item in plan.furniture if item.name == "Desk")
         chair = next(item for item in plan.furniture if item.name == "Desk Chair")
-        gap_x = max(chair.x - (desk.x + desk.w), desk.x - (chair.x + chair.w), 0.0)
-        gap_y = max(chair.y - (desk.y + desk.h), desk.y - (chair.y + chair.h), 0.0)
-        self.assertLessEqual(max(gap_x, gap_y), 1.0)
+        self.assertEqual(_gap_between(desk, chair), 0.5)  # the rule's original spacing, preserved
+        self.assertEqual(chair.y, desk.y)
+        moved = {move["item"]: move for move in plan.door_pass["moves"]}
+        self.assertEqual(moved["Desk"]["group"], "desk-set")
+        self.assertEqual(moved["Desk"]["to"][1], moved["Desk Chair"]["to"][1])
+        self.assertEqual(find_door_conflicts(plan), [])
+        self.assertEqual(plan.door_pass["unresolved"], [])
 
-    @unittest.expectedFailure
-    def test_washer_and_dryer_stay_aligned_on_mercer(self):
+    def test_washer_and_dryer_stay_aligned_on_mercer_and_door_is_clear(self):
         plan = build_plan(MERCER)
         washer = next(item for item in plan.furniture if item.name == "Washer")
         dryer = next(item for item in plan.furniture if item.name == "Dryer")
         self.assertAlmostEqual(washer.y, dryer.y)
+        self.assertAlmostEqual(dryer.x - (washer.x + washer.w), 0.4)  # original spacing preserved
+        self.assertIn("Washer", [move["item"] for move in plan.door_pass["moves"]])
+        self.assertEqual(find_door_conflicts(plan), [])
+
+    def test_rect_sample_moves_desk_set_as_a_unit(self):
+        plan, info = build_checked_plan(RECT, dict(DEFAULT_ANSWERS))
+        desk = next(item for item in plan.furniture if item.name == "Desk")
+        chair = next(item for item in plan.furniture if item.name == "Desk Chair")
+        self.assertEqual(_gap_between(desk, chair), 0.5)
+        self.assertEqual(chair.y, desk.y)
+        self.assertEqual(info["door_pass_unresolved"], [])
+        self.assertEqual(analyze_plan(plan)["checks"]["door_clearance"]["status"], "pass")
+
+    def test_infeasible_sample_reports_group_and_never_splits_it(self):
+        plan, info = build_checked_plan(INFEASIBLE, dict(DEFAULT_ANSWERS))
+        self.assertEqual(info["door_pass_moves"], [])
+        self.assertEqual([entry["members"] for entry in info["door_pass_unresolved"]], [["Desk", "Desk Chair"]])
+        desk = next(item for item in plan.furniture if item.name == "Desk")
+        chair = next(item for item in plan.furniture if item.name == "Desk Chair")
+        self.assertEqual((desk.x, desk.y, chair.x, chair.y), (1.0, 1.0, 5.5, 1.0))
+        report = analyze_plan(plan)
+        self.assertEqual(report["checks"]["door_clearance"]["status"], "fail")
+        self.assertEqual(len(report["door_pass"]["unresolved"]), 1)
+        self.assertEqual(report["modelled_violation_count"], 1)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,10 @@
+Synthetic infeasible group (desk + chair cannot clear the door as a unit; the chair alone could)
+  layout_geometry  pass       findings=0
+  containment      pass       findings=0
+  overlap          pass       findings=0
+  door_clearance   fail       findings=1
+    - Desk Chair (Office) blocks the swing clearance of the Office door
+  walkable_path    unmeasured findings=n/a
+  door pass: 1 raw conflicts, 0 items moved, 1 unresolved
+    - UNRESOLVED Desk + Desk Chair (Office): no shift up to 4.0 ft keeps the group Desk + Desk Chair inside the room, clear of door zones and of other furniture
+  Zero modelled violations means only that the modelled checks found nothing. It does not mean the layout is safe, code-compliant, accessible, or construction-ready.

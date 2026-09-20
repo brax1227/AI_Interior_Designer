@@ -124,13 +124,14 @@ class DoorConflictTests(unittest.TestCase):
     def test_resolver_moves_item_out_and_is_deterministic(self):
         chair = Furniture("Chair", 3.0, 1.0, 2.0, 2.0, "Room")
         plan = make_plan([self.room], [self.door], [chair])
-        moves = resolve_door_conflicts(plan)
-        self.assertEqual(len(moves), 1)
+        result = resolve_door_conflicts(plan)
+        self.assertEqual(len(result["moves"]), 1)
+        self.assertEqual(result["unresolved"], [])
         self.assertEqual((chair.x, chair.y), (3.0, 3.0))  # slid straight off the swing zone
         self.assertTrue(box_within_polygon((chair.x, chair.y, chair.x + chair.w, chair.y + chair.h), SQUARE))
         self.assertEqual(find_door_conflicts(plan), [])
         again = make_plan([self.room], [self.door], [Furniture("Chair", 3.0, 1.0, 2.0, 2.0, "Room")])
-        self.assertEqual(resolve_door_conflicts(again), moves)
+        self.assertEqual(resolve_door_conflicts(again), result)
 
     def test_resolver_never_creates_overlap_or_leaves_room(self):
         chair = Furniture("Chair", 3.0, 1.0, 2.0, 2.0, "Room")
@@ -147,9 +148,63 @@ class DoorConflictTests(unittest.TestCase):
         door = Opening("door", 0.5, 3.0, "Tiny", edge_index=0)
         bench = Furniture("Storage Bench", 0.2, 0.2, 3.6, 3.6, "Tiny")
         plan = make_plan([tiny], [door], [bench])
-        self.assertEqual(resolve_door_conflicts(plan), [])
+        result = resolve_door_conflicts(plan)
+        self.assertEqual(result["moves"], [])
+        self.assertEqual([entry["members"] for entry in result["unresolved"]], [["Storage Bench"]])
         self.assertEqual((bench.x, bench.y), (0.2, 0.2))
         self.assertEqual(len(find_door_conflicts(plan)), 1)
+
+
+class FurnitureGroupTests(unittest.TestCase):
+    """Groups move as one unit; a group that cannot move as a unit is reported, never split."""
+
+    def desk_set(self, room_name="Office"):
+        desk = Furniture("Desk", 1.0, 1.0, 4.0, 2.0, room_name, group="desk-set")
+        chair = Furniture("Desk Chair", 5.5, 1.0, 2.0, 2.0, room_name, group="desk-set")
+        return desk, chair
+
+    def test_group_moves_together_and_stays_adjacent(self):
+        room = room_from_polygon("Office", "office", [(0, 0), (12, 0), (12, 10), (0, 10)])
+        door = Opening("door", 5.0, 3.0, "Office", edge_index=0)  # zone x 5..8, y 0..3: hits the chair only
+        desk, chair = self.desk_set()
+        plan = make_plan([room], [door], [desk, chair])
+        result = resolve_door_conflicts(plan)
+        self.assertEqual(sorted(move["item"] for move in result["moves"]), ["Desk", "Desk Chair"])
+        self.assertEqual(result["unresolved"], [])
+        # Same shift applied to both, so the relative position is unchanged.
+        self.assertEqual((chair.x - desk.x, chair.y - desk.y), (4.5, 0.0))
+        self.assertEqual((desk.x, desk.y, chair.x, chair.y), (1.0, 3.0, 5.5, 3.0))
+        self.assertEqual(find_door_conflicts(plan), [])
+
+    def test_group_is_reported_not_split_when_only_a_member_could_escape(self):
+        # 12 x 4.5 room: the chair alone could slide +x out of the zone, but the desk
+        # cannot follow (the desk would need 7 ft, pushing the chair through the wall),
+        # and nothing can move +y. Expect: no move at all, group listed as unresolved.
+        room = room_from_polygon("Office", "office", [(0, 0), (12, 0), (12, 4.5), (0, 4.5)])
+        door = Opening("door", 5.0, 3.0, "Office", edge_index=0)
+        desk, chair = self.desk_set()
+        plan = make_plan([room], [door], [desk, chair])
+        # Sanity: a lone chair with no group would have been movable.
+        lone = make_plan([room], [door], [Furniture("Desk", 1.0, 1.0, 4.0, 2.0, "Office"), Furniture("Desk Chair", 5.5, 1.0, 2.0, 2.0, "Office")])
+        self.assertEqual([m["item"] for m in resolve_door_conflicts(lone)["moves"]], ["Desk Chair"])
+        result = resolve_door_conflicts(plan)
+        self.assertEqual(result["moves"], [])
+        self.assertEqual(len(result["unresolved"]), 1)
+        self.assertEqual(result["unresolved"][0]["group"], "desk-set")
+        self.assertEqual(result["unresolved"][0]["members"], ["Desk", "Desk Chair"])
+        self.assertEqual((desk.x, desk.y, chair.x, chair.y), (1.0, 1.0, 5.5, 1.0))
+        self.assertEqual(len(find_door_conflicts(plan)), 1)
+
+    def test_groups_are_scoped_to_a_room(self):
+        left = room_from_polygon("Left", "office", [(0, 0), (12, 0), (12, 10), (0, 10)])
+        right = room_from_polygon("Right", "office", [(12, 0), (24, 0), (24, 10), (12, 10)])
+        door = Opening("door", 5.0, 3.0, "Left", edge_index=0)
+        desk, chair = self.desk_set("Left")
+        other = Furniture("Desk", 13.0, 1.0, 4.0, 2.0, "Right", group="desk-set")
+        plan = make_plan([left, right], [door], [desk, chair, other])
+        result = resolve_door_conflicts(plan)
+        self.assertEqual(sorted(move["item"] for move in result["moves"]), ["Desk", "Desk Chair"])
+        self.assertEqual((other.x, other.y), (13.0, 1.0))
 
 
 class ZoneTests(unittest.TestCase):
@@ -184,8 +239,9 @@ class SampleLayoutTests(unittest.TestCase):
         unit, width, height, shell, rooms, openings = build_rooms(layout)
         raw = FloorPlan(unit, width, height, shell, rooms, openings, place_furniture(rooms))
         self.assertGreater(len(find_door_conflicts(raw)), 0)
-        moves = resolve_door_conflicts(raw)
-        self.assertGreater(len(moves), 0)
+        result = resolve_door_conflicts(raw)
+        self.assertGreater(len(result["moves"]), 0)
+        self.assertEqual(result["unresolved"], [])
         self.assertEqual(find_door_conflicts(raw), [])
 
     def test_validate_plan_rejects_overrunning_opening(self):

@@ -30,6 +30,9 @@ python3 floorplan_agent.py --layout mercer_layout.json --out mercer_floorplan.sv
 
 Open `mercer_floorplan.svg` to view the output. Dashed amber boxes are door swing
 and approach clearances; rule-based furniture is slid out of them after placement.
+Furniture groups (desk + chair, washer + dryer) move as one unit. A group that
+cannot clear a door as a unit is left where it is and listed as unresolved in the
+report; it is never split apart to force a pass.
 
 ## Layout validity checks
 

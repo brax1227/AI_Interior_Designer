@@ -44,6 +44,9 @@ class Furniture:
     h: float
     room_name: str
     z: float = 0.0
+    # Items sharing a group name in the same room are moved as one unit by the
+    # door-aware pass (desk + chair, washer + dryer). None means a lone item.
+    group: Optional[str] = None
 
 
 @dataclass
@@ -55,6 +58,8 @@ class FloorPlan:
     rooms: List[Room] = field(default_factory=list)
     openings: List[Opening] = field(default_factory=list)
     furniture: List[Furniture] = field(default_factory=list)
+    # Result of the last door-aware pass: {"moves": [...], "unresolved": [...]}.
+    door_pass: Dict = field(default_factory=lambda: {"moves": [], "unresolved": []})
 
 
 def load_layout(path: Path) -> Dict:
@@ -219,8 +224,8 @@ def place_bath(room: Room) -> List[Furniture]:
 
 
 def place_laundry(room: Room) -> List[Furniture]:
-    washer = Furniture("Washer", room.x + 0.8, room.y + 0.8, 2.6, 2.6, room.name)
-    dryer = Furniture("Dryer", room.x + 3.8, room.y + 0.8, 2.6, 2.6, room.name)
+    washer = Furniture("Washer", room.x + 0.8, room.y + 0.8, 2.6, 2.6, room.name, group="laundry-pair")
+    dryer = Furniture("Dryer", room.x + 3.8, room.y + 0.8, 2.6, 2.6, room.name, group="laundry-pair")
     shelf = Furniture("Laundry Shelf", room.x + 0.8, room.y + room.h - 1.4, room.w - 1.6, 0.8, room.name)
     upper = Furniture("Wall Shelf", room.x + 0.8, room.y + room.h - 1.2, room.w - 1.6, 0.5, room.name, 5.0)
     return [washer, dryer, shelf, upper]
@@ -245,8 +250,8 @@ def place_office(room: Room) -> List[Furniture]:
     chair_x = desk_x + desk_w + 0.5
     chair_y = desk_y
     return [
-        Furniture("Desk", desk_x, desk_y, desk_w, desk_h, room.name),
-        Furniture("Desk Chair", chair_x, chair_y, chair_w, chair_h, room.name),
+        Furniture("Desk", desk_x, desk_y, desk_w, desk_h, room.name, group="desk-set"),
+        Furniture("Desk Chair", chair_x, chair_y, chair_w, chair_h, room.name, group="desk-set"),
     ]
 
 
@@ -1131,8 +1136,9 @@ def build_plan(layout_path: Path) -> FloorPlan:
     furniture = place_furniture(rooms)
     plan = FloorPlan(unit_name, width_ft, height_ft, shell, rooms, openings, furniture)
     # Rule-based placement ignores doors; slide anything that landed in a swing or
-    # approach zone. Unresolvable items stay put and are reported by analyze_plan.
-    resolve_door_conflicts(plan)
+    # approach zone, groups as one unit. Unresolvable items/groups stay put and are
+    # reported by analyze_plan.
+    plan.door_pass = resolve_door_conflicts(plan)
     return plan
 
 

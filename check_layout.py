@@ -32,8 +32,13 @@ def build_checked_plan(layout_path: Path, answers: dict, resolve: bool = True) -
     plan = FloorPlan(unit_name, width_ft, height_ft, shell, rooms, openings, place_furniture(rooms))
     apply_design_preferences(plan, normalize_answers(answers))
     raw_door_conflicts = len(find_door_conflicts(plan))
-    moves = resolve_door_conflicts(plan) if resolve else []
-    return plan, {"raw_door_conflicts": raw_door_conflicts, "door_pass_moves": moves}
+    result = resolve_door_conflicts(plan) if resolve else {"moves": [], "unresolved": []}
+    plan.door_pass = result
+    return plan, {
+        "raw_door_conflicts": raw_door_conflicts,
+        "door_pass_moves": result["moves"],
+        "door_pass_unresolved": result["unresolved"],
+    }
 
 
 def main() -> int:
@@ -49,7 +54,7 @@ def main() -> int:
     answers = json.loads(Path(args.answers).read_text(encoding="utf-8")) if args.answers else dict(DEFAULT_ANSWERS)
     plan, pass_info = build_checked_plan(Path(args.layout), answers, resolve=not args.no_resolve)
     report = analyze_plan(plan)
-    report["door_pass"] = pass_info
+    report["door_pass"]["raw_door_conflicts"] = pass_info["raw_door_conflicts"]
 
     print(f"{plan.unit_name}")
     for name, check in report["checks"].items():
@@ -57,7 +62,12 @@ def main() -> int:
         print(f"  {name:16s} {check['status']:10s} findings={count}")
         for finding in check["findings"]:
             print(f"    - {finding['message']}")
-    print(f"  door pass: {pass_info['raw_door_conflicts']} raw conflicts, {len(pass_info['door_pass_moves'])} items moved")
+    print(
+        f"  door pass: {pass_info['raw_door_conflicts']} raw conflicts, {len(pass_info['door_pass_moves'])} items moved, "
+        f"{len(pass_info['door_pass_unresolved'])} unresolved"
+    )
+    for entry in pass_info["door_pass_unresolved"]:
+        print(f"    - UNRESOLVED {' + '.join(entry['members'])} ({entry['room']}): {entry['reason']}")
     print(f"  {report['disclaimer']}")
 
     if args.json_out or args.md_out:

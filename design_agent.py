@@ -916,9 +916,15 @@ def analyze_plan(plan: FloorPlan) -> Dict:
         },
     }
     hard_checks = ("layout_geometry", "containment", "overlap", "door_clearance")
+    door_pass = getattr(plan, "door_pass", None) or {"moves": [], "unresolved": []}
     return {
         "schema_version": 2,
         "checks": checks,
+        "door_pass": {
+            "moves": list(door_pass["moves"]),
+            "unresolved": list(door_pass["unresolved"]),
+            "note": "Groups (desk + chair, washer + dryer) move as one unit; a group that cannot move as a unit is left in place and listed here.",
+        },
         "modelled_violation_count": sum(checks[name]["finding_count"] for name in hard_checks),
         "unmeasured_checks": [name for name, check in checks.items() if check["status"] == "unmeasured"],
         "rooms": room_stats,
@@ -1118,6 +1124,17 @@ def write_analysis_report(report: Dict, out_json: Path, out_md: Path) -> None:
         lines.extend(["", f"### {name.replace('_', ' ')} findings", ""])
         for finding in check["findings"]:
             lines.append(f"- {finding['message']}")
+    door_pass = report.get("door_pass", {"moves": [], "unresolved": []})
+    lines.extend(["", "## Door-aware placement pass", ""])
+    lines.append(f"Items moved: {len(door_pass['moves'])}. Unresolved items/groups: {len(door_pass['unresolved'])}.")
+    if door_pass["moves"]:
+        lines.extend(["", "| Item | Group | Room | From | To | Cleared |", "| --- | --- | --- | --- | --- | --- |"])
+        for move in door_pass["moves"]:
+            lines.append(
+                f"| {move['item']} | {move.get('group') or '-'} | {move['room']} | {tuple(move['from'])} | {tuple(move['to'])} | {move['door_room']} door |"
+            )
+    for entry in door_pass["unresolved"]:
+        lines.append(f"- UNRESOLVED: {' + '.join(entry['members'])} in {entry['room']} still blocks the {entry['door_room']} door: {entry['reason']}.")
     lines.extend(["", "## Room Stats", ""])
     lines.append("| Room | Area sq ft | Free sq ft | Items | Containment | Overlap | Door | Heuristic clearance notes |")
     lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
@@ -2081,7 +2098,11 @@ def run_design(
     validate_plan(plan)
     apply_design_preferences(plan, answers)
     # Preference-driven pieces are added after the door-aware pass in build_plan.
-    resolve_door_conflicts(plan)
+    second_pass = resolve_door_conflicts(plan)
+    plan.door_pass = {
+        "moves": plan.door_pass["moves"] + second_pass["moves"],
+        "unresolved": plan.door_pass["unresolved"] + second_pass["unresolved"],
+    }
 
     style_palette = infer_palette_from_images(style_images or [])
     palette = ensure_palette(style_palette, answers["palette_preference"])

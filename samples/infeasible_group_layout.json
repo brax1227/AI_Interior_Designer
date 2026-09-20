@@ -1,0 +1,59 @@
+{
+  "geometry_version": 2,
+  "unit_name": "Synthetic infeasible group (desk + chair cannot clear the door as a unit; the chair alone could)",
+  "width_ft": 12,
+  "height_ft": 4.5,
+  "shell": {
+    "points": [
+      [
+        0,
+        0
+      ],
+      [
+        12,
+        0
+      ],
+      [
+        12,
+        4.5
+      ],
+      [
+        0,
+        4.5
+      ]
+    ]
+  },
+  "zones": [
+    {
+      "name": "Office",
+      "type": "office",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          12,
+          0
+        ],
+        [
+          12,
+          4.5
+        ],
+        [
+          0,
+          4.5
+        ]
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "room_name": "Office",
+      "kind": "door",
+      "edge_index": 0,
+      "offset": 5.0,
+      "width": 3.0
+    }
+  ]
+}

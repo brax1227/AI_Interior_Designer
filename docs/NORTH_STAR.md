@@ -12,16 +12,22 @@ A paid interior-design product that is also genuinely useful for Braxton's own s
 
 | Item | Value |
 | --- | --- |
-| Baseline (2026-09-18) | 0 users, 0 paying customers, $0 revenue |
+| Baseline (2026-09-18, confirmed) | 0 users, 0 paying customers |
+| Revenue | Not independently measured; assumed $0 given zero paying customers |
 | Target date | 2026-12-17 |
 | Target A | One design Braxton would actually use for his selected space |
 | Target B | 3 paying customers |
-| Pricing today | Free only, $0 |
+| Product model | Paid product (explicit user intent). Nothing is offered free as a strategy. |
+| Selling price | Undecided |
+| Development budget | $0: no paid APIs, services, accounts, or purchases during prototyping |
 
 ## Not yet decided (assumptions, not facts)
 
 - Which personal space Braxton will use for Target A.
-- Pricing and customer segment for Target B.
+- Selling price and customer segment for Target B.
+
+The $0 figure above is spend, not price. Earlier wording ("free only") conflated the
+two; corrected 2026-09-20.
 
 Everything in this repository about "customers", "pricing", or "the user's room"
 is an assumption until those decisions are recorded in the source file.

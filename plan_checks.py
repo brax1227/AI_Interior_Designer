@@ -224,32 +224,72 @@ def find_furniture_outside_room(plan) -> List[Dict[str, object]]:
     return problems
 
 
-def _placement_is_valid(candidate: Box, item, plan, room, zones: Sequence[Dict[str, object]]) -> bool:
+def _shifted(box: Box, dx: float, dy: float) -> Box:
+    return (box[0] + dx, box[1] + dy, box[2] + dx, box[3] + dy)
+
+
+def _placement_is_valid(candidate: Box, moving: Sequence, plan, room, zones: Sequence[Dict[str, object]]) -> bool:
+    """A shifted box is valid when it stays in the room polygon, clear of every door zone
+    and of every floor-level item that is not itself part of the moving set."""
     if not box_within_polygon(candidate, room.polygon):
         return False
     for zone in zones:
         if boxes_intersect(zone["box"], candidate):
             return False
     for other in plan.furniture:
-        if other is item or not is_floor_item(other):
+        if any(other is member for member in moving) or not is_floor_item(other):
             continue
         if boxes_intersect(candidate, furniture_box(other)):
             return False
     return True
 
 
-def resolve_door_conflicts(plan, step: float = 0.25, max_shift: float = 4.0) -> List[Dict[str, object]]:
-    """Slide floor-level furniture out of door clearance zones.
+def group_members(plan, item) -> List:
+    """All floor-level items that share `item.group` in the same room (including item)."""
+    group = getattr(item, "group", None)
+    if not group:
+        return [item]
+    return [
+        other
+        for other in plan.furniture
+        if getattr(other, "group", None) == group and other.room_name == item.room_name and is_floor_item(other)
+    ]
 
-    For each conflicting item, try the door's normal and both tangent directions and
-    keep the shortest shift that lands inside the room polygon, clear of every door
-    zone and of every other floor-level item. Items that cannot be resolved are left
-    in place and returned so the analysis report can flag them. Deterministic: order
-    follows plan.openings then plan.furniture.
+
+def _find_joint_shift(
+    members: Sequence, plan, room, zones: Sequence[Dict[str, object]], directions, step: float, max_shift: float
+) -> Optional[Tuple[float, float, float]]:
+    """Shortest shift (distance, dx, dy) that makes every member's box valid at once."""
+    best: Optional[Tuple[float, float, float]] = None
+    for dx, dy in directions:
+        distance = step
+        while distance <= max_shift + _EPS:
+            if all(
+                _placement_is_valid(_shifted(furniture_box(member), dx * distance, dy * distance), members, plan, room, zones)
+                for member in members
+            ):
+                if best is None or distance < best[0]:
+                    best = (distance, dx * distance, dy * distance)
+                break
+            distance += step
+    return best
+
+
+def resolve_door_conflicts(plan, step: float = 0.25, max_shift: float = 4.0) -> Dict[str, List[Dict[str, object]]]:
+    """Slide floor-level furniture out of door clearance zones, keeping furniture groups together.
+
+    For each conflicting item, the whole group it belongs to (see `Furniture.group`; a
+    lone item is its own group) is shifted as one unit along the door normal or either
+    tangent. The shortest shift that lands every member inside the room polygon, clear
+    of every door zone and of every other floor-level item wins. A group that cannot be
+    moved as a unit is left exactly where it was and listed under "unresolved", so the
+    door_clearance check keeps reporting it; members are never split off and moved on
+    their own. Deterministic: order follows plan.openings then plan.furniture.
     """
     room_by_name = {room.name: room for room in plan.rooms}
     zones = all_door_zones(plan)
     moves: List[Dict[str, object]] = []
+    unresolved: List[Dict[str, object]] = []
     for zone in zones:
         for item in plan.furniture:
             if not is_floor_item(item) or not boxes_intersect(zone["box"], furniture_box(item)):
@@ -257,35 +297,39 @@ def resolve_door_conflicts(plan, step: float = 0.25, max_shift: float = 4.0) -> 
             room = room_by_name.get(item.room_name)
             if room is None:
                 continue
+            members = group_members(plan, item)
             nx, ny = zone["normal"]
             ux, uy = zone["tangent"]
-            best: Optional[Tuple[float, float, float]] = None
-            for dx, dy in ((nx, ny), (ux, uy), (-ux, -uy)):
-                distance = step
-                while distance <= max_shift + _EPS:
-                    candidate = (
-                        item.x + dx * distance,
-                        item.y + dy * distance,
-                        item.x + item.w + dx * distance,
-                        item.y + item.h + dy * distance,
-                    )
-                    if _placement_is_valid(candidate, item, plan, room, zones):
-                        if best is None or distance < best[0]:
-                            best = (distance, dx * distance, dy * distance)
-                        break
-                    distance += step
+            best = _find_joint_shift(members, plan, room, zones, ((nx, ny), (ux, uy), (-ux, -uy)), step, max_shift)
+            group_name = getattr(item, "group", None)
             if best is None:
+                unresolved.append(
+                    {
+                        "item": item.name,
+                        "group": group_name,
+                        "members": [member.name for member in members],
+                        "room": item.room_name,
+                        "door_room": zone["door_room"],
+                        "reason": (
+                            f"no shift up to {max_shift} ft keeps "
+                            + ("the group " + " + ".join(member.name for member in members) if group_name else item.name)
+                            + " inside the room, clear of door zones and of other furniture"
+                        ),
+                    }
+                )
                 continue
             _distance, shift_x, shift_y = best
-            moves.append(
-                {
-                    "item": item.name,
-                    "room": item.room_name,
-                    "from": (round(item.x, 3), round(item.y, 3)),
-                    "to": (round(item.x + shift_x, 3), round(item.y + shift_y, 3)),
-                    "door_room": zone["door_room"],
-                }
-            )
-            item.x = round(item.x + shift_x, 6)
-            item.y = round(item.y + shift_y, 6)
-    return moves
+            for member in members:
+                moves.append(
+                    {
+                        "item": member.name,
+                        "group": group_name,
+                        "room": member.room_name,
+                        "from": (round(member.x, 3), round(member.y, 3)),
+                        "to": (round(member.x + shift_x, 3), round(member.y + shift_y, 3)),
+                        "door_room": zone["door_room"],
+                    }
+                )
+                member.x = round(member.x + shift_x, 6)
+                member.y = round(member.y + shift_y, 6)
+    return {"moves": moves, "unresolved": unresolved}
