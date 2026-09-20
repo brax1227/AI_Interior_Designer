@@ -10,3 +10,5 @@ Read [AI_WORKFLOW.md](AI_WORKFLOW.md) at the start of each session if it is not 
 Consult the relevant existing project documents before changing behavior:
 
 - [README.md](README.md)
+- [docs/NORTH_STAR.md](docs/NORTH_STAR.md) (mirror of the PM-owned target; do not add competing targets)
+- [docs/validation/](docs/validation/) (dated checkpoints with before/after evidence)

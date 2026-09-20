@@ -1,0 +1,20 @@
+{
+  "geometry_version": 2,
+  "unit_name": "Adversarial invalid layout (deliberately broken, for check demonstration)",
+  "width_ft": 18,
+  "height_ft": 14,
+  "shell": {
+    "points": [[0, 0], [16, 0], [16, 12], [0, 12]]
+  },
+  "zones": [
+    { "name": "Room A", "type": "bedroom", "polygon": [[0, 0], [10, 0], [10, 8], [0, 8]] },
+    { "name": "Closet", "type": "closet", "polygon": [[0, 8], [4, 8], [4, 12], [0, 12]] },
+    { "name": "Room B", "type": "living", "polygon": [[9, 0], [16, 0], [16, 12], [9, 12]] },
+    { "name": "Annex", "type": "office", "polygon": [[14, 10], [18, 10], [18, 14], [14, 14]] }
+  ],
+  "openings": [
+    { "room_name": "Room A", "kind": "door", "edge_index": 0, "offset": 9.0, "width": 3.0 },
+    { "room_name": "Closet", "kind": "door", "edge_index": 0, "offset": 0.5, "width": 3.0 },
+    { "room_name": "Room B", "kind": "door", "edge_index": 3, "offset": 1.0, "width": 2.5 }
+  ]
+}

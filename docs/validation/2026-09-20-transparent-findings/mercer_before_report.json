@@ -1,0 +1,105 @@
+{
+  "score": 14,
+  "issues": [],
+  "rooms": [
+    {
+      "room": "Bedroom",
+      "room_type": "bedroom",
+      "room_area_sqft": 168.0,
+      "furniture_area_sqft": 51.0,
+      "estimated_free_area_sqft": 117.0,
+      "item_count": 5,
+      "clearance_warnings": 6,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Bathroom",
+      "room_type": "bath",
+      "room_area_sqft": 84.0,
+      "furniture_area_sqft": 19.9,
+      "estimated_free_area_sqft": 64.1,
+      "item_count": 5,
+      "clearance_warnings": 4,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Closet/Hall",
+      "room_type": "closet",
+      "room_area_sqft": 44.0,
+      "furniture_area_sqft": 0,
+      "estimated_free_area_sqft": 44.0,
+      "item_count": 0,
+      "clearance_warnings": 0,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Dining",
+      "room_type": "dining",
+      "room_area_sqft": 103.5,
+      "furniture_area_sqft": 20.2,
+      "estimated_free_area_sqft": 83.2,
+      "item_count": 1,
+      "clearance_warnings": 0,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Kitchen",
+      "room_type": "kitchen",
+      "room_area_sqft": 146.0,
+      "furniture_area_sqft": 43.2,
+      "estimated_free_area_sqft": 102.8,
+      "item_count": 11,
+      "clearance_warnings": 20,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Laundry",
+      "room_type": "utility",
+      "room_area_sqft": 52.0,
+      "furniture_area_sqft": 17.4,
+      "estimated_free_area_sqft": 34.6,
+      "item_count": 4,
+      "clearance_warnings": 4,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Office/Den",
+      "room_type": "office",
+      "room_area_sqft": 155.0,
+      "furniture_area_sqft": 12.0,
+      "estimated_free_area_sqft": 143.0,
+      "item_count": 2,
+      "clearance_warnings": 2,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Living Room",
+      "room_type": "living",
+      "room_area_sqft": 153.0,
+      "furniture_area_sqft": 41.9,
+      "estimated_free_area_sqft": 111.1,
+      "item_count": 5,
+      "clearance_warnings": 4,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    },
+    {
+      "room": "Patio",
+      "room_type": "outdoor",
+      "room_area_sqft": 96.0,
+      "furniture_area_sqft": 11.4,
+      "estimated_free_area_sqft": 84.6,
+      "item_count": 5,
+      "clearance_warnings": 3,
+      "overlap_warnings": 0,
+      "door_conflicts": 0
+    }
+  ]
+}

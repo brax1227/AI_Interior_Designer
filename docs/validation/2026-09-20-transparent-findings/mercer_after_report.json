@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "checks": {
+    "layout_geometry": {
+      "status": "pass",
+      "method": "zones inside shell polygon, no zone-zone interior overlap, openings within their wall edge",
+      "finding_count": 0,
+      "findings": []
+    },
+    "containment": {
+      "status": "pass",
+      "method": "each furniture box inside its room polygon, edges tested against notches",
+      "finding_count": 0,
+      "findings": []
+    },
+    "overlap": {
+      "status": "pass",
+      "method": "axis-aligned box intersection between items whose height ranges overlap; rugs exempt",
+      "finding_count": 0,
+      "findings": []
+    },
+    "door_clearance": {
+      "status": "pass",
+      "method": "floor-level items intersecting a door swing square or approach strip",
+      "finding_count": 0,
+      "findings": []
+    },
+    "walkable_path": {
+      "status": "unmeasured",
+      "method": null,
+      "finding_count": null,
+      "findings": [],
+      "note": "Not implemented. No claim is made about circulation between doors or around furniture."
+    }
+  },
+  "modelled_violation_count": 0,
+  "unmeasured_checks": [
+    "walkable_path"
+  ],
+  "rooms": [
+    {
+      "room": "Bedroom",
+      "room_type": "bedroom",
+      "room_area_sqft": 168.0,
+      "floor_furniture_area_sqft": 51.0,
+      "estimated_free_area_sqft": 117.0,
+      "item_count": 5,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 6
+    },
+    {
+      "room": "Bathroom",
+      "room_type": "bath",
+      "room_area_sqft": 84.0,
+      "floor_furniture_area_sqft": 19.9,
+      "estimated_free_area_sqft": 64.1,
+      "item_count": 5,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 4
+    },
+    {
+      "room": "Closet/Hall",
+      "room_type": "closet",
+      "room_area_sqft": 44.0,
+      "floor_furniture_area_sqft": 0,
+      "estimated_free_area_sqft": 44.0,
+      "item_count": 0,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 0
+    },
+    {
+      "room": "Dining",
+      "room_type": "dining",
+      "room_area_sqft": 103.5,
+      "floor_furniture_area_sqft": 20.2,
+      "estimated_free_area_sqft": 83.2,
+      "item_count": 1,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 0
+    },
+    {
+      "room": "Kitchen",
+      "room_type": "kitchen",
+      "room_area_sqft": 146.0,
+      "floor_furniture_area_sqft": 43.2,
+      "estimated_free_area_sqft": 102.8,
+      "item_count": 11,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 20
+    },
+    {
+      "room": "Laundry",
+      "room_type": "utility",
+      "room_area_sqft": 52.0,
+      "floor_furniture_area_sqft": 17.4,
+      "estimated_free_area_sqft": 34.6,
+      "item_count": 4,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 4
+    },
+    {
+      "room": "Office/Den",
+      "room_type": "office",
+      "room_area_sqft": 155.0,
+      "floor_furniture_area_sqft": 12.0,
+      "estimated_free_area_sqft": 143.0,
+      "item_count": 2,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 2
+    },
+    {
+      "room": "Living Room",
+      "room_type": "living",
+      "room_area_sqft": 153.0,
+      "floor_furniture_area_sqft": 41.9,
+      "estimated_free_area_sqft": 111.1,
+      "item_count": 5,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 4
+    },
+    {
+      "room": "Patio",
+      "room_type": "outdoor",
+      "room_area_sqft": 96.0,
+      "floor_furniture_area_sqft": 11.4,
+      "estimated_free_area_sqft": 84.6,
+      "item_count": 5,
+      "containment_findings": 0,
+      "overlap_findings": 0,
+      "door_clearance_findings": 0,
+      "heuristic_clearance_notes": 3
+    }
+  ],
+  "assumptions": [
+    "All room, shell, and opening dimensions come from the layout file and are unverified assumptions; no field measurements exist.",
+    "Furniture sizes are fixed typical residential dimensions hard-coded in the placement rules, not products the user owns.",
+    "Door clearance = a swing square (depth = door width) inside the door's room plus an approach strip (depth = min(3 ft, door width)) on the far side when that side is another room; exterior doors get no approach zone; hinge side and in/out swing are not modelled.",
+    "Items above 0.1 ft (upper cabinets, wall shelves, mirrors) and rugs never count as obstructions.",
+    "Overlap uses axis-aligned boxes and the FURNITURE_HEIGHTS_FT table; rotated furniture is not modelled.",
+    "Clearance notes use the FURNITURE_CLEARANCE_FT table on every side of an item, including sides against a wall, so built-ins always generate notes; treat them as heuristic prompts, not violations.",
+    "Walkable path between doors is not implemented; the field is reported as unmeasured on purpose."
+  ],
+  "disclaimer": "Zero modelled violations means only that the modelled checks found nothing. It does not mean the layout is safe, code-compliant, accessible, or construction-ready."
+}

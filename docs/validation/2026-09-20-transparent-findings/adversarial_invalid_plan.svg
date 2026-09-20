@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400.0" height="320.0">
+<rect x="0.0" y="0.0" width="400.0" height="320.0" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" />
+<polygon points="20.0,300.0 340.0,300.0 340.0,60.0 20.0,60.0" fill="#ffffff" stroke="#475569" stroke-width="1.5" />
+<polygon points="20.0,300.0 220.0,300.0 220.0,140.0 20.0,140.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="98.0" y="220.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Room A</text>
+<polygon points="20.0,140.0 100.0,140.0 100.0,60.0 20.0,60.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="38.0" y="100.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Closet</text>
+<polygon points="200.0,300.0 340.0,300.0 340.0,60.0 200.0,60.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="248.0" y="180.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Room B</text>
+<polygon points="300.0,100.0 380.0,100.0 380.0,20.0 300.0,20.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="318.0" y="60.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Annex</text>
+<polygon points="200.0,297.5 260.0,297.5 260.0,302.5 200.0,302.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="30.0,137.5 90.0,137.5 90.0,142.5 30.0,142.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="202.5,80.0 202.5,130.0 197.5,130.0 197.5,80.0" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="200.0,300.0 260.0,300.0 260.0,240.0 200.0,240.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="30.0,140.0 90.0,140.0 90.0,80.0 30.0,80.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="30.0,200.0 90.0,200.0 90.0,140.0 30.0,140.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="200.0,130.0 250.0,130.0 250.0,80.0 200.0,80.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<rect x="70.0" y="160.0" width="100.0" height="134.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="74.0" y="174.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Queen Bed</text>
+<rect x="220.0" y="150.0" width="140.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="224.0" y="164.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Sofa</text>
+<rect x="376.0" y="226.0" width="30.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="380.0" y="240.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Coffee Table</text>
+<rect x="170.0" y="110.0" width="100.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="174.0" y="124.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">TV Console</text>
+<rect x="260.0" y="220.0" width="60.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="264.0" y="234.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Accent Chair</text>
+<rect x="320.0" y="40.0" width="80.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="324.0" y="54.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Desk</text>
+<rect x="410.0" y="40.0" width="40.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="414.0" y="54.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Desk Chair</text>
+<rect x="168.0" y="256.0" width="24.0" height="24.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="172.0" y="270.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Floor Lamp</text>
+<rect x="26.0" y="252.0" width="28.0" height="28.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="30.0" y="266.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Table Lamp</text>
+</svg>

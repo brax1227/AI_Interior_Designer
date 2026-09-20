@@ -1,5 +1,8 @@
 # House Designer - Mercer Agent (MVP)
 
+Project intent and targets: see [docs/NORTH_STAR.md](docs/NORTH_STAR.md) (mirror of the
+PM-owned record). Validation checkpoints live under `docs/validation/`.
+
 This is a rule-based interior design and documentation agent for the Mercer
 apartment layout. It generates a furnished plan, a 3D model, design guidance,
 shopping outputs, renovation concepts, and starter construction-style documents.
@@ -37,9 +40,22 @@ and approach clearances; rule-based furniture is slid out of them after placemen
 - furniture must sit inside its room polygon (notches included);
 - floor-level furniture must not overlap or block a door's swing/approach zone.
 
-Failures that the door-aware pass cannot resolve are listed in
-`outputs/space_plan_report.md`. These are concept-plan sanity checks only, not
-code-compliance, egress, or structural verification.
+`outputs/space_plan_report.md` reports each check separately (pass / fail with the
+findings) and lists `walkable_path` as **unmeasured** because it is not implemented.
+There is deliberately no aggregate score. Zero modelled violations means only that
+the modelled checks found nothing; it is not a safety, code-compliance, egress, or
+construction-readiness statement. Per-room "heuristic clearance notes" are prompts
+from a fixed clearance table, not violations.
+
+Check-only report for any layout, including deliberately broken ones (never raises;
+exit code 1 when a modelled check fails):
+
+```bash
+python3 check_layout.py --layout samples/adversarial_invalid_layout.json
+python3 check_layout.py --layout samples/rect_two_room_layout.json --svg rect.svg --md rect_report.md
+```
+
+Synthetic sample layouts and what each is for: [samples/README.md](samples/README.md).
 
 ```bash
 python3 -m unittest discover -s tests -v

@@ -1,0 +1,8 @@
+Synthetic rectangle (two rooms, not a real unit)
+  layout_geometry  pass       findings=0
+  containment      pass       findings=0
+  overlap          pass       findings=0
+  door_clearance   pass       findings=0
+  walkable_path    unmeasured findings=n/a
+  door pass: 2 raw conflicts, 2 items moved
+  Zero modelled violations means only that the modelled checks found nothing. It does not mean the layout is safe, code-compliant, accessible, or construction-ready.

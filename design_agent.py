@@ -779,37 +779,80 @@ def z_ranges_overlap(first: Furniture, second: Furniture, tolerance: float = 0.1
     return first_low < second_high - tolerance and second_low < first_high - tolerance
 
 
+ANALYSIS_DISCLAIMER = (
+    "Zero modelled violations means only that the modelled checks found nothing. It does not "
+    "mean the layout is safe, code-compliant, accessible, or construction-ready."
+)
+
+ANALYSIS_ASSUMPTIONS = [
+    "All room, shell, and opening dimensions come from the layout file and are unverified assumptions; no field measurements exist.",
+    "Furniture sizes are fixed typical residential dimensions hard-coded in the placement rules, not products the user owns.",
+    "Door clearance = a swing square (depth = door width) inside the door's room plus an approach strip (depth = min(3 ft, door width)) on the far side when that side is another room; exterior doors get no approach zone; hinge side and in/out swing are not modelled.",
+    "Items above 0.1 ft (upper cabinets, wall shelves, mirrors) and rugs never count as obstructions.",
+    "Overlap uses axis-aligned boxes and the FURNITURE_HEIGHTS_FT table; rotated furniture is not modelled.",
+    "Clearance notes use the FURNITURE_CLEARANCE_FT table on every side of an item, including sides against a wall, so built-ins always generate notes; treat them as heuristic prompts, not violations.",
+    "Walkable path between doors is not implemented; the field is reported as unmeasured on purpose.",
+]
+
+
+def _check(status: str, method: str, findings: List[Dict[str, object]]) -> Dict[str, object]:
+    return {"status": status, "method": method, "finding_count": len(findings), "findings": findings}
+
+
 def analyze_plan(plan: FloorPlan) -> Dict:
-    issues: List[Dict[str, str]] = []
-    room_stats: List[Dict[str, object]] = []
+    """Report each layout check separately. There is deliberately no aggregate score."""
+    room_by_name = {room.name: room for room in plan.rooms}
 
+    geometry_findings: List[Dict[str, object]] = []
+    for problem in find_zone_shell_violations(plan):
+        geometry_findings.append({"kind": "zone_outside_shell", "room": problem["room"], "message": problem["message"]})
     for problem in find_zone_overlaps(plan):
-        issues.append({"severity": "high", "room": " / ".join(problem["rooms"]), "message": problem["message"] + "."})
+        geometry_findings.append({"kind": "zone_overlap", "rooms": problem["rooms"], "message": problem["message"]})
     for problem in find_opening_overruns(plan):
-        issues.append({"severity": "high", "room": problem["room"], "message": problem["message"] + "."})
-    outside = {(problem["room"], problem["item"]) for problem in find_furniture_outside_room(plan)}
-    door_conflicts = find_door_conflicts(plan)
-    for conflict in door_conflicts:
-        issues.append({"severity": "high", "room": conflict["item_room"], "message": conflict["message"] + "."})
-    blocked_by_room: Dict[str, int] = {}
-    for conflict in door_conflicts:
-        blocked_by_room[conflict["item_room"]] = blocked_by_room.get(conflict["item_room"], 0) + 1
+        geometry_findings.append(
+            {"kind": "opening_overrun", "room": problem["room"], "opening_index": problem["index"], "message": problem["message"]}
+        )
 
+    containment_findings = [
+        {"room": problem["room"], "item": problem["item"], "message": problem["message"]}
+        for problem in find_furniture_outside_room(plan)
+    ]
+
+    overlap_findings: List[Dict[str, object]] = []
+    items = list(plan.furniture)
+    for idx, first in enumerate(items):
+        for second in items[idx + 1 :]:
+            if is_soft_surface(first) or is_soft_surface(second):
+                continue
+            if not z_ranges_overlap(first, second):
+                continue
+            if intersects(furniture_box(first), furniture_box(second)):
+                overlap_findings.append(
+                    {
+                        "room": first.room_name if first.room_name == second.room_name else f"{first.room_name} / {second.room_name}",
+                        "items": [first.name, second.name],
+                        "message": f"{first.name} ({first.room_name}) overlaps {second.name} ({second.room_name})",
+                    }
+                )
+
+    door_findings = [
+        {
+            "door_room": conflict["door_room"],
+            "opening_index": conflict["opening_index"],
+            "side": conflict["side"],
+            "item": conflict["item"],
+            "room": conflict["item_room"],
+            "message": conflict["message"],
+        }
+        for conflict in find_door_conflicts(plan)
+    ]
+
+    room_stats: List[Dict[str, object]] = []
     for room in plan.rooms:
         room_items = [item for item in plan.furniture if item.room_name == room.name]
         room_box = (room.x, room.y, room.x + room.w, room.y + room.h)
-        clearance_violations = 0
-        overlap_violations = 0
-
+        clearance_notes = 0
         for item in room_items:
-            if (room.name, item.name) in outside:
-                issues.append(
-                    {
-                        "severity": "high",
-                        "room": room.name,
-                        "message": f"{item.name} extends beyond room bounds.",
-                    }
-                )
             clearance = clearance_box(item)
             if item.z <= 0.1 and (
                 clearance[0] < room_box[0]
@@ -817,51 +860,78 @@ def analyze_plan(plan: FloorPlan) -> Dict:
                 or clearance[2] > room_box[2]
                 or clearance[3] > room_box[3]
             ):
-                clearance_violations += 1
-
+                clearance_notes += 1
         for idx, first in enumerate(room_items):
             for second in room_items[idx + 1 :]:
-                if is_soft_surface(first) or is_soft_surface(second):
+                if is_soft_surface(first) or is_soft_surface(second) or not z_ranges_overlap(first, second):
                     continue
-                if not z_ranges_overlap(first, second):
-                    continue
-                if intersects(furniture_box(first), furniture_box(second)):
-                    overlap_violations += 1
-                    issues.append(
-                        {
-                            "severity": "high",
-                            "room": room.name,
-                            "message": f"{first.name} overlaps {second.name}.",
-                        }
-                    )
-                elif intersects(clearance_box(first), clearance_box(second)):
-                    clearance_violations += 1
-
+                if not intersects(furniture_box(first), furniture_box(second)) and intersects(
+                    clearance_box(first), clearance_box(second)
+                ):
+                    clearance_notes += 1
         room_area = polygon_area(room.polygon)
         furniture_area = sum(item.w * item.h for item in room_items if is_floor_item(item))
-        free_area = max(room_area - furniture_area, 0.0)
         room_stats.append(
             {
                 "room": room.name,
                 "room_type": room.room_type,
                 "room_area_sqft": round(room_area, 1),
-                "furniture_area_sqft": round(furniture_area, 1),
-                "estimated_free_area_sqft": round(free_area, 1),
+                "floor_furniture_area_sqft": round(furniture_area, 1),
+                "estimated_free_area_sqft": round(max(room_area - furniture_area, 0.0), 1),
                 "item_count": len(room_items),
-                "clearance_warnings": clearance_violations,
-                "overlap_warnings": overlap_violations,
-                "door_conflicts": blocked_by_room.get(room.name, 0),
+                "containment_findings": sum(1 for f in containment_findings if f["room"] == room.name),
+                "overlap_findings": sum(1 for f in overlap_findings if f["room"] == room.name),
+                "door_clearance_findings": sum(1 for f in door_findings if f["room"] == room.name),
+                "heuristic_clearance_notes": clearance_notes,
             }
         )
 
-    score = max(0, 100 - len([issue for issue in issues if issue["severity"] == "high"]) * 25)
-    score -= sum(stat["clearance_warnings"] for stat in room_stats if isinstance(stat["clearance_warnings"], int)) * 2
-    score = clamp(score, 0, 100)
-    return {
-        "score": round(score, 1),
-        "issues": issues,
-        "rooms": room_stats,
+    checks = {
+        "layout_geometry": _check(
+            "fail" if geometry_findings else "pass",
+            "zones inside shell polygon, no zone-zone interior overlap, openings within their wall edge",
+            geometry_findings,
+        ),
+        "containment": _check(
+            "fail" if containment_findings else "pass",
+            "each furniture box inside its room polygon, edges tested against notches",
+            containment_findings,
+        ),
+        "overlap": _check(
+            "fail" if overlap_findings else "pass",
+            "axis-aligned box intersection between items whose height ranges overlap; rugs exempt",
+            overlap_findings,
+        ),
+        "door_clearance": _check(
+            "fail" if door_findings else "pass",
+            "floor-level items intersecting a door swing square or approach strip",
+            door_findings,
+        ),
+        "walkable_path": {
+            "status": "unmeasured",
+            "method": None,
+            "finding_count": None,
+            "findings": [],
+            "note": "Not implemented. No claim is made about circulation between doors or around furniture.",
+        },
     }
+    hard_checks = ("layout_geometry", "containment", "overlap", "door_clearance")
+    return {
+        "schema_version": 2,
+        "checks": checks,
+        "modelled_violation_count": sum(checks[name]["finding_count"] for name in hard_checks),
+        "unmeasured_checks": [name for name, check in checks.items() if check["status"] == "unmeasured"],
+        "rooms": room_stats,
+        "assumptions": list(ANALYSIS_ASSUMPTIONS),
+        "disclaimer": ANALYSIS_DISCLAIMER,
+    }
+
+
+def analysis_summary_line(report: Dict) -> str:
+    """One honest line for sheets and manifests, replacing the old aggregate score."""
+    checks = report["checks"]
+    parts = [f"{name.replace('_', ' ')}: {check['status']}" for name, check in checks.items()]
+    return "Space plan checks - " + "; ".join(parts)
 
 
 def write_obj(
@@ -1033,26 +1103,33 @@ def write_shopping_list(items: List[Dict], out_json: Path, out_csv: Path) -> Non
 
 def write_analysis_report(report: Dict, out_json: Path, out_md: Path) -> None:
     out_json.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    lines = [
-        "# Space Planning Report",
-        "",
-        f"Overall score: {report['score']}/100",
-        "",
-        "## Issues",
-        "",
-    ]
-    if report["issues"]:
-        for issue in report["issues"]:
-            lines.append(f"- [{issue['severity']}] {issue['room']}: {issue['message']}")
-    else:
-        lines.append("- No major overlap or out-of-bounds issues detected.")
+    lines = ["# Space Planning Report", "", report["disclaimer"], "", "## Checks", ""]
+    lines.append("| Check | Status | Findings | Method |")
+    lines.append("| --- | --- | --- | --- |")
+    for name, check in report["checks"].items():
+        count = "n/a" if check["finding_count"] is None else str(check["finding_count"])
+        method = check["method"] or check.get("note", "")
+        lines.append(f"| {name.replace('_', ' ')} | {check['status']} | {count} | {method} |")
+    lines.append("")
+    lines.append(f"Modelled violations: {report['modelled_violation_count']}. Unmeasured: {', '.join(report['unmeasured_checks']) or 'none'}.")
+    for name, check in report["checks"].items():
+        if not check["findings"]:
+            continue
+        lines.extend(["", f"### {name.replace('_', ' ')} findings", ""])
+        for finding in check["findings"]:
+            lines.append(f"- {finding['message']}")
     lines.extend(["", "## Room Stats", ""])
+    lines.append("| Room | Area sq ft | Free sq ft | Items | Containment | Overlap | Door | Heuristic clearance notes |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for room in report["rooms"]:
         lines.append(
-            f"- {room['room']}: free area {room['estimated_free_area_sqft']} sq ft, "
-            f"{room['item_count']} items, clearance warnings {room['clearance_warnings']}, "
-            f"door conflicts {room.get('door_conflicts', 0)}"
+            f"| {room['room']} | {room['room_area_sqft']} | {room['estimated_free_area_sqft']} | {room['item_count']} | "
+            f"{room['containment_findings']} | {room['overlap_findings']} | {room['door_clearance_findings']} | "
+            f"{room['heuristic_clearance_notes']} |"
         )
+    lines.extend(["", "## Assumptions", ""])
+    for assumption in report["assumptions"]:
+        lines.append(f"- {assumption}")
     out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -2183,7 +2260,7 @@ def run_design(
         sheet_entries=drawing_set,
         highlights=[
             f"Concept direction: {design_brief['concept_name']}",
-            f"Space plan score: {analysis_report['score']}",
+            analysis_summary_line(analysis_report),
             "Includes 3D model, schedules, renovation package, and starter sheet set.",
         ],
     )
@@ -2215,7 +2292,8 @@ def run_design(
         "unit": plan.unit_name,
         "palette": palette,
         "answers": answers,
-        "space_plan_score": analysis_report["score"],
+        "space_plan_checks": {name: check["status"] for name, check in analysis_report["checks"].items()},
+        "space_plan_modelled_violations": analysis_report["modelled_violation_count"],
         "outputs": {
             "dimensioned_plan_svg": str(dimensioned_plan_path),
             "construction_sheet_svg": str(construction_sheet_path),

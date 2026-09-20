@@ -1,0 +1,21 @@
+Adversarial invalid layout (deliberately broken, for check demonstration)
+  layout_geometry  fail       findings=4
+    - Annex zone extends outside the unit shell
+    - Room A and Room B zones overlap
+    - Room B and Annex zones overlap
+    - door (offset 9.0 ft, width 3.0 ft) runs 2.00 ft past its 10.0 ft wall edge
+  containment      fail       findings=6
+    - Sofa extends beyond room bounds.
+    - Coffee Table extends beyond room bounds.
+    - TV Console extends beyond room bounds.
+    - Desk extends beyond room bounds.
+    - Desk Chair extends beyond room bounds.
+    - Floor Lamp extends beyond room bounds.
+  overlap          fail       findings=1
+    - Queen Bed (Room A) overlaps Floor Lamp (Room B)
+  door_clearance   fail       findings=2
+    - Queen Bed (Room A) blocks the approach clearance of the Closet door
+    - TV Console (Room B) blocks the swing clearance of the Room B door
+  walkable_path    unmeasured findings=n/a
+  door pass: 2 raw conflicts, 0 items moved
+  Zero modelled violations means only that the modelled checks found nothing. It does not mean the layout is safe, code-compliant, accessible, or construction-ready.
