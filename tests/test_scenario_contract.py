@@ -64,7 +64,7 @@ class OfflineScenarioTests(unittest.TestCase):
         scenario = load_scenario()
         self.assertTrue(scenario["example"])
         self.assertEqual(scenario["property"]["data_status"], "example_public_plan")
-        self.assertIn("Not a real", scenario["property"]["data_status_note"])
+        self.assertIn("not a real, located, or measured property", scenario["property"]["data_status_note"].lower())
         self.assertEqual(scenario["property"]["source"]["kind"], "public_stock_plan")
         names = {r["name"]: r for block in scenario["layouts"]["after"]["rooms"] for r in block["rooms"]}
         self.assertEqual(names["Master Bedroom"]["published_dimensions"], "12' 2\" x 14'")
