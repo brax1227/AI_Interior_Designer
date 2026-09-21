@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/brax1227/AI_Interior_Designer/contracts/property_design_scenario.schema.json",
+  "title": "Property/design scenario contract",
+  "description": "Hand-off between the AI_Interior_Designer repo and the Housing investment dashboard. Estimates carry provenance; the resale block is a scenario, never a valuation or profit claim. scenario_tools.validate_scenario is the dependency-free reference checker.",
+  "type": "object",
+  "required": ["contract_version", "scenario_id", "created", "producer", "property", "layouts", "renovation_estimate", "transaction_costs", "resale_scenario", "disclaimers"],
+  "additionalProperties": true,
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "required": ["kind", "source", "date", "verified"],
+      "properties": {
+        "kind": {"enum": ["published", "assumption", "internal_catalog", "vendor_quote", "invoice", "comp", "owner_measured"]},
+        "source": {"type": "string"},
+        "date": {"type": ["string", "null"], "description": "ISO date the figure was obtained; null when unknown"},
+        "verified": {"type": "boolean"}
+      }
+    },
+    "band": {
+      "type": "object",
+      "required": ["low", "base", "high"],
+      "properties": {"low": {"type": "number"}, "base": {"type": "number"}, "high": {"type": "number"}},
+      "description": "Estimate band; validator enforces low <= base <= high"
+    },
+    "checks": {
+      "type": "object",
+      "required": ["layout_geometry", "containment", "overlap", "door_clearance", "walkable_path"],
+      "additionalProperties": {"enum": ["pass", "fail", "unmeasured"]}
+    }
+  },
+  "properties": {
+    "contract_version": {"const": "0.1"},
+    "scenario_id": {"type": "string", "minLength": 1},
+    "created": {"type": "string", "format": "date"},
+    "producer": {
+      "type": "object",
+      "required": ["repo", "commit"],
+      "properties": {"repo": {"type": "string"}, "commit": {"type": "string"}, "tool": {"type": "string"}}
+    },
+    "property": {
+      "type": "object",
+      "required": ["label", "address", "source", "dimension_provenance"],
+      "properties": {
+        "label": {"type": "string"},
+        "address": {"type": ["string", "null"], "description": "null when withheld or not applicable (stock plan)"},
+        "source": {
+          "type": "object",
+          "required": ["kind", "name", "accessed"],
+          "properties": {
+            "kind": {"enum": ["public_stock_plan", "builder_plan", "public_listing", "owner_measured", "other"]},
+            "name": {"type": "string"},
+            "url": {"type": ["string", "null"]},
+            "accessed": {"type": "string", "format": "date"},
+            "license_note": {"type": "string"}
+          }
+        },
+        "dimension_provenance": {"enum": ["published", "assumed", "mixed", "owner_measured"]}
+      }
+    },
+    "layouts": {
+      "type": "object",
+      "required": ["before", "after"],
+      "properties": {
+        "before": {"type": "object", "required": ["description"], "properties": {"description": {"type": "string"}, "evidence": {"type": "array", "items": {"type": "string"}}}},
+        "after": {
+          "type": "object",
+          "required": ["description", "rooms"],
+          "properties": {
+            "description": {"type": "string"},
+            "rooms": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["layout_file", "rooms", "checks", "modelled_violation_count", "unmeasured_checks", "door_pass"],
+                "properties": {
+                  "layout_file": {"type": "string"},
+                  "rooms": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["name", "published_dimensions", "dimension_provenance"],
+                      "properties": {
+                        "name": {"type": "string"},
+                        "room_type": {"type": "string"},
+                        "modelled_width_ft": {"type": "number"},
+                        "modelled_depth_ft": {"type": "number"},
+                        "modelled_area_sqft": {"type": "number"},
+                        "published_dimensions": {"type": ["string", "null"]},
+                        "dimension_provenance": {"enum": ["published", "assumed", "mixed", "owner_measured"]},
+                        "openings_provenance": {"enum": ["published", "assumed"]},
+                        "assumptions": {"type": "array", "items": {"type": "string"}}
+                      }
+                    }
+                  },
+                  "checks": {"$ref": "#/$defs/checks"},
+                  "modelled_violation_count": {"type": "integer", "minimum": 0},
+                  "unmeasured_checks": {"type": "array", "items": {"type": "string"}},
+                  "door_pass": {"type": "object", "required": ["moves", "unresolved"], "properties": {"moves": {"type": "integer"}, "unresolved": {"type": "integer"}}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "renovation_estimate": {
+      "type": "object",
+      "required": ["currency", "basis_date", "items", "totals", "contingency", "grand_total"],
+      "properties": {
+        "currency": {"type": "string"},
+        "basis_date": {"type": ["string", "null"]},
+        "scope_note": {"type": "string"},
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["item", "quantity", "low", "base", "high", "provenance"],
+            "properties": {
+              "item": {"type": "string"},
+              "room": {"type": "string"},
+              "category": {"type": "string"},
+              "quantity": {"type": "number", "minimum": 0},
+              "unit": {"type": "string"},
+              "low": {"type": "number"}, "base": {"type": "number"}, "high": {"type": "number"},
+              "provenance": {"$ref": "#/$defs/provenance"}
+            }
+          }
+        },
+        "totals": {"$ref": "#/$defs/band"},
+        "contingency": {
+          "allOf": [{"$ref": "#/$defs/band"}],
+          "required": ["pct", "provenance"],
+          "properties": {"pct": {"type": "number", "minimum": 0}, "provenance": {"$ref": "#/$defs/provenance"}}
+        },
+        "grand_total": {"$ref": "#/$defs/band"}
+      }
+    },
+    "transaction_costs": {
+      "type": "object",
+      "required": ["holding", "selling"],
+      "properties": {
+        "holding": {
+          "type": "object",
+          "required": ["months", "provenance"],
+          "properties": {
+            "months": {"type": "integer", "minimum": 0},
+            "monthly": {"$ref": "#/$defs/band"},
+            "total": {"$ref": "#/$defs/band"},
+            "provenance": {"$ref": "#/$defs/provenance"}
+          }
+        },
+        "selling": {
+          "type": "object",
+          "required": ["pct_of_sale_price", "provenance"],
+          "properties": {"pct_of_sale_price": {"type": ["number", "null"]}, "provenance": {"$ref": "#/$defs/provenance"}}
+        }
+      }
+    },
+    "resale_scenario": {
+      "type": "object",
+      "required": ["status", "comps", "value_low", "value_base", "value_high"],
+      "properties": {
+        "status": {"enum": ["not_evaluated", "draft", "reviewed"]},
+        "comps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["provenance"],
+            "properties": {
+              "label": {"type": "string"},
+              "sale_price": {"type": ["number", "null"]},
+              "sale_date": {"type": ["string", "null"]},
+              "note": {"type": "string"},
+              "provenance": {"$ref": "#/$defs/provenance"}
+            }
+          }
+        },
+        "value_low": {"type": ["number", "null"]},
+        "value_base": {"type": ["number", "null"]},
+        "value_high": {"type": ["number", "null"]},
+        "note": {"type": "string"}
+      },
+      "not": {"anyOf": [{"required": ["guaranteed_value"]}, {"required": ["expected_profit"]}, {"required": ["roi"]}]}
+    },
+    "disclaimers": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340.0" height="340.0">
+<rect x="0.0" y="0.0" width="340.0" height="340.0" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" />
+<polygon points="20.0,320.0 320.0,320.0 320.0,20.0 20.0,20.0" fill="#ffffff" stroke="#475569" stroke-width="1.5" />
+<polygon points="20.0,320.0 320.0,320.0 320.0,20.0 20.0,20.0" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+<text x="148.0" y="170.0" font-size="12px" fill="#222" text-anchor="start" font-weight="normal">Great Room</text>
+<polygon points="140.0,317.5 200.0,317.5 200.0,322.5 140.0,322.5" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="220.0,22.5 120.0,22.5 120.0,17.5 220.0,17.5" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.5" />
+<polygon points="317.5,210.0 317.5,130.0 322.5,130.0 322.5,210.0" fill="#fde68a" stroke="#b45309" stroke-width="1.5" />
+<polygon points="140.0,320.0 200.0,320.0 200.0,260.0 140.0,260.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<polygon points="240.0,210.0 320.0,210.0 320.0,130.0 240.0,130.0" fill="none" stroke="#f59e0b" stroke-width="1.0" stroke-dasharray="4 3" />
+<rect x="40.0" y="140.0" width="140.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="44.0" y="154.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Sofa</text>
+<rect x="196.0" y="216.0" width="30.0" height="40.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="200.0" y="230.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Coffee Table</text>
+<rect x="150.0" y="70.0" width="100.0" height="30.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="154.0" y="84.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">TV Console</text>
+<rect x="240.0" y="240.0" width="60.0" height="60.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5" />
+<text x="244.0" y="254.0" font-size="10px" fill="#222" text-anchor="start" font-weight="normal">Accent Chair</text>
+</svg>

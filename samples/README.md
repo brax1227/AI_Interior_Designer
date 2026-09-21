@@ -15,3 +15,13 @@ Run the check-only report on any of them:
 python3 check_layout.py --layout samples/adversarial_invalid_layout.json
 python3 check_layout.py --layout samples/rect_two_room_layout.json --svg /tmp/rect.svg
 ```
+
+## Public-plan rooms (`public_plans/`)
+
+| File | Published (text on source page) | Assumed |
+| --- | --- | --- |
+| `houseplans_430_40_master_bedroom.json` | 12'2" x 14', 9' ceiling (Houseplans.com plan 430-40, accessed 2026-09-21) | door and window positions/widths, exterior wall, adjacency |
+| `houseplans_430_40_great_room.json` | 15' x 15', 9' ceiling (same source) | entry and kitchen openings, window, fireplace wall, adjacency |
+
+Each file's `provenance` block lists exactly what was published and what was assumed.
+Nothing was read off the plan image.

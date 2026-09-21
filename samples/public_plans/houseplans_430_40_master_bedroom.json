@@ -1,0 +1,97 @@
+{
+  "geometry_version": 2,
+  "unit_name": "Houseplans.com plan 430-40, Master Bedroom (published 12'2\" x 14'; openings assumed)",
+  "width_ft": 12.1667,
+  "height_ft": 14,
+  "shell": {
+    "points": [
+      [
+        0,
+        0
+      ],
+      [
+        12.1667,
+        0
+      ],
+      [
+        12.1667,
+        14
+      ],
+      [
+        0,
+        14
+      ]
+    ]
+  },
+  "zones": [
+    {
+      "name": "Master Bedroom",
+      "type": "bedroom",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          12.1667,
+          0
+        ],
+        [
+          12.1667,
+          14
+        ],
+        [
+          0,
+          14
+        ]
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "room_name": "Master Bedroom",
+      "kind": "door",
+      "edge_index": 3,
+      "offset": 1.0,
+      "width": 2.67,
+      "assumed": true
+    },
+    {
+      "room_name": "Master Bedroom",
+      "kind": "window",
+      "edge_index": 1,
+      "offset": 4.5,
+      "width": 5.0,
+      "assumed": true
+    }
+  ],
+  "provenance": {
+    "source": {
+      "kind": "public_stock_plan",
+      "publisher": "Houseplans.com",
+      "plan_number": "430-40",
+      "url": "https://www.houseplans.com/plan/1300-square-feet-3-bedrooms-2-bathroom-country-house-plans-2-garage-34126",
+      "accessed": "2026-09-21",
+      "designer_credit": "not stated as text on the page",
+      "license_note": "Dimensions used as published facts with attribution; no plan drawings copied."
+    },
+    "published_dimensions": {
+      "Master Bedroom": "12' 2\" x 14'",
+      "main_ceiling_height": "9'",
+      "exterior_walls": "2x4 standard"
+    },
+    "assumed": [
+      "door location/width (2'8\") on the 14 ft wall",
+      "window location/width on the opposite 14 ft wall",
+      "which wall faces the exterior",
+      "interior wall thickness (0.25 ft drawn only)",
+      "adjacency to other rooms (not modelled)"
+    ],
+    "not_published_as_text": [
+      "door/window positions",
+      "closet door",
+      "bath door"
+    ],
+    "note": "Room width/depth are published as text on the Houseplans.com plan page for plan 430-40 (accessed 2026-09-21). Door and window positions, swing, sill/head heights and wall thickness are NOT published as text and are assumptions marked below; they were not read off the plan image."
+  }
+}

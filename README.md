@@ -59,6 +59,22 @@ python3 check_layout.py --layout samples/rect_two_room_layout.json --svg rect.sv
 ```
 
 Synthetic sample layouts and what each is for: [samples/README.md](samples/README.md).
+Two rooms from a publicly documented stock plan (published room dimensions, assumed
+openings) live in `samples/public_plans/`; the source search and its limits are in
+`docs/validation/2026-09-21-public-plan/SOURCE_SHORTLIST.md`.
+
+## Housing dashboard hand-off (scenario contract v0.1)
+
+`contracts/property_design_scenario.schema.json` defines a compact JSON contract:
+before/after layout evidence with checks, an itemized renovation estimate with
+low/base/high and per-item provenance, separate contingency/holding/selling blocks,
+and a resale/comps block that is a scenario, never a valuation or profit claim.
+`scenarios/houseplans_430_40_offline.json` is the offline example. See
+[docs/integration/HOUSING_SCENARIO_CONTRACT.md](docs/integration/HOUSING_SCENARIO_CONTRACT.md).
+
+```bash
+python3 scenario_tools.py scenarios/houseplans_430_40_offline.json
+```
 
 ```bash
 python3 -m unittest discover -s tests -v

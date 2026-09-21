@@ -1,0 +1,105 @@
+{
+  "geometry_version": 2,
+  "unit_name": "Houseplans.com plan 430-40, Great Room (published 15' x 15'; openings assumed)",
+  "width_ft": 15,
+  "height_ft": 15,
+  "shell": {
+    "points": [
+      [
+        0,
+        0
+      ],
+      [
+        15,
+        0
+      ],
+      [
+        15,
+        15
+      ],
+      [
+        0,
+        15
+      ]
+    ]
+  },
+  "zones": [
+    {
+      "name": "Great Room",
+      "type": "living",
+      "polygon": [
+        [
+          0,
+          0
+        ],
+        [
+          15,
+          0
+        ],
+        [
+          15,
+          15
+        ],
+        [
+          0,
+          15
+        ]
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "room_name": "Great Room",
+      "kind": "door",
+      "edge_index": 0,
+      "offset": 6.0,
+      "width": 3.0,
+      "assumed": true
+    },
+    {
+      "room_name": "Great Room",
+      "kind": "window",
+      "edge_index": 2,
+      "offset": 5.0,
+      "width": 5.0,
+      "assumed": true
+    },
+    {
+      "room_name": "Great Room",
+      "kind": "door",
+      "edge_index": 1,
+      "offset": 5.5,
+      "width": 4.0,
+      "assumed": true
+    }
+  ],
+  "provenance": {
+    "source": {
+      "kind": "public_stock_plan",
+      "publisher": "Houseplans.com",
+      "plan_number": "430-40",
+      "url": "https://www.houseplans.com/plan/1300-square-feet-3-bedrooms-2-bathroom-country-house-plans-2-garage-34126",
+      "accessed": "2026-09-21",
+      "designer_credit": "not stated as text on the page",
+      "license_note": "Dimensions used as published facts with attribution; no plan drawings copied."
+    },
+    "published_dimensions": {
+      "Great Room": "15' x 15'",
+      "main_ceiling_height": "9'",
+      "exterior_walls": "2x4 standard"
+    },
+    "assumed": [
+      "entry opening (3 ft) on the south wall",
+      "opening to kitchen/dining (4 ft cased opening, modelled as a door) on the east wall",
+      "window on the north wall",
+      "fireplace location (not modelled)",
+      "adjacency (not modelled)"
+    ],
+    "not_published_as_text": [
+      "door/window positions",
+      "fireplace wall",
+      "open-plan boundary with kitchen/dining"
+    ],
+    "note": "Room width/depth are published as text on the Houseplans.com plan page for plan 430-40 (accessed 2026-09-21). Door and window positions, swing, sill/head heights and wall thickness are NOT published as text and are assumptions marked below; they were not read off the plan image."
+  }
+}

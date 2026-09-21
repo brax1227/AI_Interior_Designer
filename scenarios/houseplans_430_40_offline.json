@@ -1,0 +1,343 @@
+{
+  "contract_version": "0.1",
+  "scenario_id": "houseplans-430-40-offline-001",
+  "created": "2026-09-21",
+  "producer": {
+    "repo": "brax1227/AI_Interior_Designer",
+    "commit": "cd9c190",
+    "tool": "scenario_tools.py"
+  },
+  "property": {
+    "label": "Houseplans.com plan 430-40, two rooms (not an Auburn property)",
+    "address": null,
+    "source": {
+      "kind": "public_stock_plan",
+      "name": "Houseplans.com plan 430-40 (cottage, 1,300 sq ft, 3 bed / 2 bath)",
+      "url": "https://www.houseplans.com/plan/1300-square-feet-3-bedrooms-2-bathroom-country-house-plans-2-garage-34126",
+      "accessed": "2026-09-21",
+      "license_note": "Published numeric room dimensions reused as facts with attribution; designer credit not stated as text on the page; no drawings copied."
+    },
+    "dimension_provenance": "mixed"
+  },
+  "layouts": {
+    "before": {
+      "description": "Empty rooms at published dimensions; openings assumed.",
+      "evidence": [
+        "samples/public_plans/houseplans_430_40_master_bedroom.json",
+        "samples/public_plans/houseplans_430_40_great_room.json"
+      ]
+    },
+    "after": {
+      "description": "Rule-based furnishing after the door-aware pass.",
+      "rooms": [
+        {
+          "layout_file": "samples/public_plans/houseplans_430_40_master_bedroom.json",
+          "rooms": [
+            {
+              "name": "Master Bedroom",
+              "room_type": "bedroom",
+              "modelled_width_ft": 12.17,
+              "modelled_depth_ft": 14.0,
+              "modelled_area_sqft": 170.33,
+              "published_dimensions": "12' 2\" x 14'",
+              "dimension_provenance": "published",
+              "openings_provenance": "assumed",
+              "assumptions": [
+                "door location/width (2'8\") on the 14 ft wall",
+                "window location/width on the opposite 14 ft wall",
+                "which wall faces the exterior",
+                "interior wall thickness (0.25 ft drawn only)",
+                "adjacency to other rooms (not modelled)"
+              ]
+            }
+          ],
+          "checks": {
+            "layout_geometry": "pass",
+            "containment": "pass",
+            "overlap": "pass",
+            "door_clearance": "pass",
+            "walkable_path": "unmeasured"
+          },
+          "modelled_violation_count": 0,
+          "unmeasured_checks": [
+            "walkable_path"
+          ],
+          "door_pass": {
+            "moves": 1,
+            "unresolved": 0
+          }
+        },
+        {
+          "layout_file": "samples/public_plans/houseplans_430_40_great_room.json",
+          "rooms": [
+            {
+              "name": "Great Room",
+              "room_type": "living",
+              "modelled_width_ft": 15.0,
+              "modelled_depth_ft": 15.0,
+              "modelled_area_sqft": 225.0,
+              "published_dimensions": "15' x 15'",
+              "dimension_provenance": "published",
+              "openings_provenance": "assumed",
+              "assumptions": [
+                "entry opening (3 ft) on the south wall",
+                "opening to kitchen/dining (4 ft cased opening, modelled as a door) on the east wall",
+                "window on the north wall",
+                "fireplace location (not modelled)",
+                "adjacency (not modelled)"
+              ]
+            }
+          ],
+          "checks": {
+            "layout_geometry": "pass",
+            "containment": "pass",
+            "overlap": "pass",
+            "door_clearance": "pass",
+            "walkable_path": "unmeasured"
+          },
+          "modelled_violation_count": 0,
+          "unmeasured_checks": [
+            "walkable_path"
+          ],
+          "door_pass": {
+            "moves": 0,
+            "unresolved": 0
+          }
+        }
+      ]
+    }
+  },
+  "renovation_estimate": {
+    "currency": "USD",
+    "basis_date": null,
+    "scope_note": "Furnishing-only itemization from the pipeline's shopping list. No labor, finishes, MEP, permits, or structural items are estimated.",
+    "items": [
+      {
+        "item": "Queen Bed",
+        "room": "Master Bedroom",
+        "category": "bed",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 500.0,
+        "base": 1150.0,
+        "high": 1800.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Nightstand",
+        "room": "Master Bedroom",
+        "category": "side_table",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 80.0,
+        "base": 190.0,
+        "high": 300.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Nightstand",
+        "room": "Master Bedroom",
+        "category": "side_table",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 80.0,
+        "base": 190.0,
+        "high": 300.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Dresser",
+        "room": "Master Bedroom",
+        "category": "dresser",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 250.0,
+        "base": 575.0,
+        "high": 900.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Table Lamp",
+        "room": "Master Bedroom",
+        "category": "lighting",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 40.0,
+        "base": 110.0,
+        "high": 180.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Sofa",
+        "room": "Great Room",
+        "category": "sofa",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 700.0,
+        "base": 1600.0,
+        "high": 2500.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Coffee Table",
+        "room": "Great Room",
+        "category": "coffee_table",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 120.0,
+        "base": 360.0,
+        "high": 600.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "TV Console",
+        "room": "Great Room",
+        "category": "tv_console",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 150.0,
+        "base": 425.0,
+        "high": 700.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Accent Chair",
+        "room": "Great Room",
+        "category": "accent_chair",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 150.0,
+        "base": 475.0,
+        "high": 800.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      },
+      {
+        "item": "Floor Lamp",
+        "room": "Great Room",
+        "category": "lighting",
+        "quantity": 1,
+        "unit": "ea",
+        "low": 60.0,
+        "base": 160.0,
+        "high": 260.0,
+        "provenance": {
+          "kind": "internal_catalog",
+          "source": "design_agent.py FURNITURE_CATALOG price_range_usd, budget tier mid",
+          "date": null,
+          "verified": false
+        }
+      }
+    ],
+    "totals": {
+      "low": 2130.0,
+      "base": 5235.0,
+      "high": 8340.0
+    },
+    "contingency": {
+      "pct": 15.0,
+      "low": 319.5,
+      "base": 785.25,
+      "high": 1251.0,
+      "provenance": {
+        "kind": "assumption",
+        "source": "placeholder percentage chosen for the contract example",
+        "date": null,
+        "verified": false
+      }
+    },
+    "grand_total": {
+      "low": 2449.5,
+      "base": 6020.25,
+      "high": 9591.0
+    }
+  },
+  "transaction_costs": {
+    "holding": {
+      "months": 0,
+      "monthly": {
+        "low": 0.0,
+        "base": 0.0,
+        "high": 0.0
+      },
+      "total": {
+        "low": 0.0,
+        "base": 0.0,
+        "high": 0.0
+      },
+      "provenance": {
+        "kind": "assumption",
+        "source": "not estimated; Housing owner supplies taxes, insurance, utilities, financing",
+        "date": null,
+        "verified": false
+      }
+    },
+    "selling": {
+      "pct_of_sale_price": null,
+      "provenance": {
+        "kind": "assumption",
+        "source": "not estimated; commission/closing costs are market- and deal-specific",
+        "date": null,
+        "verified": false
+      }
+    }
+  },
+  "resale_scenario": {
+    "status": "not_evaluated",
+    "comps": [],
+    "value_low": null,
+    "value_base": null,
+    "value_high": null,
+    "note": "No comparable sales were collected. Any value here would be a scenario input from the Housing owner, not an output of this repo."
+  },
+  "disclaimers": [
+    "Layouts are concept-level; passing the modelled checks is not a safety, code, egress, or construction-readiness statement.",
+    "Renovation figures are estimates with stated provenance; none is a quote unless its provenance says vendor_quote or invoice.",
+    "The resale block is a scenario for discussion. It is not a valuation, an appraisal, or a guarantee of value or profit.",
+    "Nothing in this file is financial advice."
+  ]
+}

@@ -12,3 +12,4 @@ Consult the relevant existing project documents before changing behavior:
 - [README.md](README.md)
 - [docs/NORTH_STAR.md](docs/NORTH_STAR.md) (mirror of the PM-owned target; do not add competing targets)
 - [docs/validation/](docs/validation/) (dated checkpoints with before/after evidence)
+- [docs/integration/HOUSING_SCENARIO_CONTRACT.md](docs/integration/HOUSING_SCENARIO_CONTRACT.md) (read-only hand-off contract to the Housing dashboard; never write to that repo)
