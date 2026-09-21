@@ -16,7 +16,7 @@ import unittest
 import urllib.error
 import urllib.request
 import uuid
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from socketserver import TCPServer
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -25,6 +25,36 @@ sys.path.insert(0, str(ROOT))
 import local_server  # noqa: E402
 
 RUN_DIR_RE = re.compile(r'href="(/outputs/run_[0-9a-f_]+)/space_plan_report\.md"')
+HREF_RE = re.compile(r'href="([^"]+)"')
+
+
+class OutputUrlTests(unittest.TestCase):
+    """URLs must be POSIX and percent-encoded whatever the host's path flavour is."""
+
+    def test_windows_paths_produce_forward_slash_urls(self):
+        base = PureWindowsPath(r"C:\Users\braxton\AI_Interior_Designer")
+        run = base / "outputs" / "run_20260920_210807_d30820"
+        self.assertEqual(local_server.output_url(run, base=base), "/outputs/run_20260920_210807_d30820")
+        self.assertEqual(
+            local_server.output_url(run, "sheets", "A101_plan_sheet.svg", base=base),
+            "/outputs/run_20260920_210807_d30820/sheets/A101_plan_sheet.svg",
+        )
+        viewer = local_server.viewer_url_for(run, base=base)
+        self.assertEqual(
+            viewer,
+            "/viewer?obj=/outputs/run_20260920_210807_d30820/mercer_model.obj&mtl=/outputs/run_20260920_210807_d30820/mercer_model.mtl",
+        )
+        self.assertNotIn("\\", viewer)
+
+    def test_posix_paths_produce_the_same_urls(self):
+        base = PurePosixPath("/home/user/AI_Interior_Designer")
+        run = base / "outputs" / "run_x"
+        self.assertEqual(local_server.output_url(run, "sheets", "G001_cover_sheet.svg", base=base), "/outputs/run_x/sheets/G001_cover_sheet.svg")
+
+    def test_components_are_percent_encoded(self):
+        base = PurePosixPath("/ws")
+        run = base / "outputs" / "run 1"
+        self.assertEqual(local_server.output_url(run, "a b.md", base=base), "/outputs/run%201/a%20b.md")
 
 
 def multipart(fields, files=()):
@@ -100,7 +130,19 @@ class LocalServerFlowTests(unittest.TestCase):
 
     def run_dir_from(self, html):
         match = RUN_DIR_RE.search(html)
-        return match.group(1) if match else None
+        self.assertIsNotNone(match, "success page must link space_plan_report.md with a forward-slash URL")
+        return match.group(1)
+
+    def assert_every_link_serves(self, html):
+        """Every href on the success page must be backslash-free and actually download."""
+        links = HREF_RE.findall(html)
+        self.assertTrue(links)
+        for link in links:
+            self.assertNotIn("\\", link, link)
+            if link.startswith("/outputs/") or link.startswith("/viewer?"):
+                status, body = self.get(link)
+                self.assertEqual(status, 200, link)
+                self.assertGreater(len(body), 0, link)
 
     # -- tests
     def test_index_serves(self):
@@ -112,7 +154,8 @@ class LocalServerFlowTests(unittest.TestCase):
         status, html = self.post({"layout": "mercer_layout.json"})
         self.assertEqual(status, 200)
         run_dir = self.run_dir_from(html)
-        self.assertIsNotNone(run_dir, "success page must link the report")
+        self.assertNotIn("\\", html.split("<body>", 1)[-1])
+        self.assert_every_link_serves(html)
         self.assertIn("All modelled checks passed.", html)
         self.assertIn("walkable path</strong>: unmeasured", html)
 
@@ -162,7 +205,7 @@ class LocalServerFlowTests(unittest.TestCase):
         self.assertEqual(status, 400)
         self.assertIn("Generation failed: Zone", html)
         self.assertIn("extends outside the unit shell", html)
-        self.assertIsNone(self.run_dir_from(html))
+        self.assertIsNone(RUN_DIR_RE.search(html), "a failed request must not link a report")
         after = set(local_server.OUTPUTS_DIR.glob("run_*")) if local_server.OUTPUTS_DIR.exists() else set()
         self.assertEqual(before, after, "a failed request must not leave a run folder")
 

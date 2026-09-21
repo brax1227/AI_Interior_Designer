@@ -86,3 +86,25 @@ width, and any fixed built-ins as boxes. Photos are not needed for the checks. R
 space and customer validation remain absent; nothing here changes the Sep 18 baseline
 of 0 users / 0 paying, or the Dec 17 target (one usable own-space design, 3 paying
 customers, price undecided, $0 development spend).
+
+## Follow-up INTERIOR-20260920-05 (2026-09-21): Windows URL separators
+
+PM's Windows run of f722946 (Python 3.13) failed 3 of the 8 web-flow cases: the success
+page interpolated `Path` objects into hrefs, so on Windows links read
+`/outputs\run_...\space_plan_report.md`, the report regex found nothing, and the
+follow-on requests were built from `None`. Linux never showed it because `str(Path)`
+happens to use `/` there.
+
+Fix: `local_server.output_url(out_dir, *parts)` builds every URL from `Path.parts`
+joined with `/` and percent-encoded per component; `viewer_url_for` does the same for
+the OBJ/MTL query. All 22 success-page links (including nested `sheets/*.svg`) and
+the viewer query go through it. No filesystem path is ever formatted into a URL.
+
+Verification without a Windows box: `OutputUrlTests` feed `PureWindowsPath`
+(`C:\Users\...`) and `PurePosixPath` bases through the same helpers and assert
+identical forward-slash output and no backslash anywhere. The live e2e test now
+extracts every `href` on the success page, asserts none contains a backslash, and
+downloads each one over HTTP expecting 200 (nested sheets, OBJ/MTL viewer included).
+The report regex was not loosened; a missing link now fails with a named assertion
+instead of a `None` URL. Suite: 46 tests, all pass on Linux. Windows confirmation is
+the PM's rerun.

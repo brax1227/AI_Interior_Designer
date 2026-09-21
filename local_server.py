@@ -1005,6 +1005,24 @@ def build_answers(fields: Dict[str, str]) -> Dict:
     }
 
 
+def output_url(out_dir: Path, *parts: str, base: Path = None) -> str:
+    """URL path for a file inside a run folder, independent of the host's path separator.
+
+    Filesystem paths stay `Path` objects; URLs are always built from path *components*
+    joined with '/', then percent-encoded. Never format a Path into an href directly:
+    on Windows that yields backslashes, which browsers do not treat as separators.
+    """
+    base = BASE_DIR if base is None else base
+    components = list(out_dir.relative_to(base).parts) + [part for part in parts if part]
+    return "/" + "/".join(quote(component, safe="") for component in components)
+
+
+def viewer_url_for(out_dir: Path, base: Path = None) -> str:
+    obj_url = output_url(out_dir, "mercer_model.obj", base=base)
+    mtl_url = output_url(out_dir, "mercer_model.mtl", base=base)
+    return f"/viewer?obj={quote(obj_url, safe='/')}&mtl={quote(mtl_url, safe='/')}"
+
+
 def resolve_layout_path(raw: str) -> Path:
     """Only layout files inside this workspace can be used; the form is a path, not an upload."""
     candidate = (BASE_DIR / (raw or "mercer_layout.json")).resolve()
@@ -1107,34 +1125,30 @@ class DesignHandler(SimpleHTTPRequestHandler):
                 else:
                     style_note = f"{len(style_images)} file(s) used to infer the palette."
 
-            obj_rel = out_dir.relative_to(BASE_DIR) / "mercer_model.obj"
-            mtl_rel = out_dir.relative_to(BASE_DIR) / "mercer_model.mtl"
-            viewer_url = (
-                f"/viewer?obj={quote('/' + str(obj_rel))}&mtl={quote('/' + str(mtl_rel))}"
-            )
+            url = lambda *parts: output_url(out_dir, *parts)  # noqa: E731
             page = render_success_page(
-                f"/{out_dir.relative_to(BASE_DIR)}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'manifest.json'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'design_brief.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'space_plan_report.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'renovation_package.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'renovation_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'finish_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'room_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'wall_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'opening_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'cabinet_schedule.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'dimensioned_plan.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'construction_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'spec_package.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheet_index.md'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'G001_cover_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'A101_plan_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'A201_elevations_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'A202_room_elevations_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'sheets' / 'A601_notes_sheet.svg'}",
-                f"/{out_dir.relative_to(BASE_DIR) / 'drawing_set_print.html'}",
-                viewer_url,
+                url(),
+                url("manifest.json"),
+                url("design_brief.md"),
+                url("space_plan_report.md"),
+                url("renovation_package.md"),
+                url("renovation_schedule.md"),
+                url("finish_schedule.md"),
+                url("room_schedule.md"),
+                url("wall_schedule.md"),
+                url("opening_schedule.md"),
+                url("cabinet_schedule.md"),
+                url("dimensioned_plan.svg"),
+                url("construction_sheet.svg"),
+                url("spec_package.md"),
+                url("sheet_index.md"),
+                url("sheets", "G001_cover_sheet.svg"),
+                url("sheets", "A101_plan_sheet.svg"),
+                url("sheets", "A201_elevations_sheet.svg"),
+                url("sheets", "A202_room_elevations_sheet.svg"),
+                url("sheets", "A601_notes_sheet.svg"),
+                url("drawing_set_print.html"),
+                viewer_url_for(out_dir),
                 render_checks_summary(report, style_note),
             )
         except (FileNotFoundError, ValueError, KeyError) as exc:
