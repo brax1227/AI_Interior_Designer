@@ -60,6 +60,24 @@ class OfflineScenarioTests(unittest.TestCase):
         self.assertEqual(validate_scenario(scenario), [])
         self.assertEqual(scenario["contract_version"], CONTRACT_VERSION)
 
+    def test_offline_scenario_is_marked_example_with_published_facts_kept(self):
+        scenario = load_scenario()
+        self.assertTrue(scenario["example"])
+        self.assertEqual(scenario["property"]["data_status"], "example_public_plan")
+        self.assertIn("Not a real", scenario["property"]["data_status_note"])
+        self.assertEqual(scenario["property"]["source"]["kind"], "public_stock_plan")
+        names = {r["name"]: r for block in scenario["layouts"]["after"]["rooms"] for r in block["rooms"]}
+        self.assertEqual(names["Master Bedroom"]["published_dimensions"], "12' 2\" x 14'")
+        self.assertEqual(names["Great Room"]["published_dimensions"], "15' x 15'")
+
+    def test_producer_pins_the_code_revision_that_has_the_tool(self):
+        scenario = load_scenario()
+        producer = scenario["producer"]
+        self.assertEqual(producer["commit"], producer["code_commit"])
+        self.assertNotEqual(producer["commit"], "cd9c190")  # that commit predates scenario_tools.py
+        self.assertIsInstance(producer["code_commit_exact"], bool)
+        self.assertIn("git log", producer["data_revision"])
+
     def test_offline_scenario_is_honest_about_what_it_does_not_know(self):
         scenario = load_scenario()
         self.assertIsNone(scenario["property"]["address"])
@@ -123,6 +141,17 @@ class ValidatorRejectsTests(unittest.TestCase):
 
     def test_walkable_path_cannot_be_dropped(self):
         self.assert_rejected(lambda s: s["layouts"]["after"]["rooms"][0]["checks"].pop("walkable_path"), "walkable_path")
+
+    def test_example_flag_must_agree_with_data_status(self):
+        self.assert_rejected(lambda s: s.__setitem__("example", False), "contradicts")
+        self.assert_rejected(lambda s: s["property"].__setitem__("data_status", "real_property_verified"), "contradicts")
+        self.assert_rejected(lambda s: s["property"].pop("data_status"), "data_status")
+
+    def test_real_verified_requires_owner_measured_dimensions(self):
+        def mutate(s):
+            s["example"] = False
+            s["property"]["data_status"] = "real_property_verified"
+        self.assert_rejected(mutate, "owner_measured")
 
     def test_wrong_contract_version(self):
         self.assert_rejected(lambda s: s.__setitem__("contract_version", "0.2"), "contract_version")

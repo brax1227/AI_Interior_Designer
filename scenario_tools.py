@@ -23,6 +23,10 @@ CONTRACT_VERSION = "0.1"
 ROOT = Path(__file__).resolve().parent
 
 PROVENANCE_KINDS = {"published", "assumption", "internal_catalog", "vendor_quote", "invoice", "comp", "owner_measured"}
+# What the scenario as a whole is. Importers gate on this before treating anything as a real property.
+DATA_STATUSES = {"example_public_plan", "synthetic", "real_property_unverified", "real_property_verified"}
+EXAMPLE_STATUSES = {"example_public_plan", "synthetic"}
+PRODUCER_FILES = ("scenario_tools.py", "contracts/property_design_scenario.schema.json", "design_agent.py", "floorplan_agent.py", "plan_checks.py")
 RESALE_STATUSES = {"not_evaluated", "draft", "reviewed"}
 DIMENSION_PROVENANCE = {"published", "assumed", "mixed", "owner_measured"}
 
@@ -39,6 +43,31 @@ def _git_commit() -> str:
         return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:
         return "unknown"
+
+
+def _uncommitted_producer_files() -> List[str]:
+    """Producer files with uncommitted changes at generation time; empty when the code commit is exact."""
+    try:
+        status = subprocess.check_output(["git", "status", "--porcelain", "--", *PRODUCER_FILES], cwd=ROOT, text=True)
+    except Exception:
+        return ["unknown"]
+    return sorted(line[3:].strip() for line in status.splitlines() if line.strip())
+
+
+def producer_block() -> Dict:
+    """Code revision that produced the numbers. The data revision is the commit that contains the scenario
+    file itself, which cannot be known at generation time; importers read it from git history of the file."""
+    commit = _git_commit()
+    dirty = _uncommitted_producer_files()
+    return {
+        "repo": "brax1227/AI_Interior_Designer",
+        "commit": commit,
+        "code_commit": commit,
+        "code_commit_exact": not dirty,
+        "uncommitted_producer_files": dirty,
+        "tool": "scenario_tools.py",
+        "data_revision": "the git commit that contains this scenario file (git log -- scenarios/<file>); not knowable at generation time",
+    }
 
 
 def _price_range(text: str) -> Optional[tuple]:
@@ -130,6 +159,8 @@ def build_scenario(
     holding_months: int = 0,
     holding_monthly: Optional[Dict[str, float]] = None,
     selling_pct: Optional[float] = None,
+    data_status: str = "example_public_plan",
+    data_status_note: Optional[str] = None,
 ) -> Dict:
     """Assemble a scenario from (layout_path, run_dir) pairs. All money fields are assumptions unless overridden."""
     before_after = [room_block(Path(layout), Path(run)) for layout, run in layouts]
@@ -155,15 +186,22 @@ def build_scenario(
         "pct_of_sale_price": selling_pct,
         "provenance": {"kind": "assumption", "source": "not estimated; commission/closing costs are market- and deal-specific", "date": None, "verified": False},
     }
+    if data_status not in DATA_STATUSES:
+        raise ValueError(f"data_status must be one of {sorted(DATA_STATUSES)}")
     return {
         "contract_version": CONTRACT_VERSION,
         "scenario_id": scenario_id,
         "created": date.today().isoformat(),
-        "producer": {"repo": "brax1227/AI_Interior_Designer", "commit": _git_commit(), "tool": "scenario_tools.py"},
+        "example": data_status in EXAMPLE_STATUSES,
+        "producer": producer_block(),
         "property": {
             "label": property_label,
             "address": None,
             "source": source,
+            "data_status": data_status,
+            "data_status_note": data_status_note
+            or "Not a real, located, or measured property. Room widths/depths are published facts from the named source; "
+            "openings, furnishings, and every cost figure are assumptions or unverified catalog values (see per-item provenance).",
             "dimension_provenance": "mixed",
         },
         "layouts": {
@@ -236,10 +274,15 @@ def validate_scenario(scenario: Dict) -> List[str]:
         errors.append(f"$.contract_version: {version!r} != {CONTRACT_VERSION!r}")
     for key in ("scenario_id", "created"):
         _require(scenario, key, "$", errors, str)
+    example = _require(scenario, "example", "$", errors, bool)
     producer = _require(scenario, "producer", "$", errors, dict)
     if isinstance(producer, dict):
         for key in ("repo", "commit"):
             _require(producer, key, "$.producer", errors, str)
+        if "code_commit" in producer and producer.get("code_commit") != producer.get("commit"):
+            errors.append("$.producer.code_commit: must equal producer.commit (commit is the code revision)")
+        if "code_commit_exact" in producer and not isinstance(producer["code_commit_exact"], bool):
+            errors.append("$.producer.code_commit_exact: must be boolean")
 
     prop = _require(scenario, "property", "$", errors, dict)
     if isinstance(prop, dict):
@@ -253,6 +296,15 @@ def validate_scenario(scenario: Dict) -> List[str]:
         dim = _require(prop, "dimension_provenance", "$.property", errors, str)
         if dim is not None and dim not in DIMENSION_PROVENANCE:
             errors.append(f"$.property.dimension_provenance: {dim!r} not in {sorted(DIMENSION_PROVENANCE)}")
+        status = _require(prop, "data_status", "$.property", errors, str)
+        _require(prop, "data_status_note", "$.property", errors, str)
+        if status is not None and status not in DATA_STATUSES:
+            errors.append(f"$.property.data_status: {status!r} not in {sorted(DATA_STATUSES)}")
+        elif status is not None and isinstance(example, bool):
+            if example != (status in EXAMPLE_STATUSES):
+                errors.append(f"$.example: {example} contradicts property.data_status {status!r}")
+        if status == "real_property_verified" and dim != "owner_measured":
+            errors.append("$.property.data_status: real_property_verified requires dimension_provenance owner_measured")
 
     layouts = _require(scenario, "layouts", "$", errors, dict)
     if isinstance(layouts, dict):

@@ -43,3 +43,17 @@ For a real property the contract needs: measured room polygons and openings
 cost inputs from the Housing side, and one dated `comp` to move resale to `draft`.
 Until then the scenario is an interface proof. Dec 17 target (one usable own-space
 design, 3 paying customers) remains unmeasured; 0 users / 0 paying since Sep 18.
+
+## Follow-up INTERIOR-20260920-07: provenance correction (narrow)
+
+- `producer.commit` was `cd9c190`, the checkout HEAD when the file was generated, which
+  predates `scenario_tools.py` and the schema. It now records the code revision that
+  contains the tool, with `code_commit`, `code_commit_exact` and
+  `uncommitted_producer_files` so a regeneration from a dirty tree is visible. The
+  data revision is the commit containing the file; the tool never embeds it.
+- Added top-level `example: true` and `property.data_status = example_public_plan`
+  with a note that keeps the published room sizes as facts and marks openings, costs
+  and resale as assumptions. Not labelled `synthetic`, because the sizes are not invented.
+- Estimate items, totals, layouts and checks are byte-identical to 897a34c (asserted
+  during regeneration). Validator and schema gained the matching rules; 5 new tests.
+- Mapping note for the Housing adapter: `docs/integration/HOUSING_MAPPING_NOTE_0.1.md`.

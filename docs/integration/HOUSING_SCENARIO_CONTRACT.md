@@ -14,8 +14,11 @@ field: the dashboard derives whatever it derives from the inputs and owns that l
 
 ```
 contract_version "0.1"
-scenario_id, created, producer{repo, commit, tool}
-property{label, address|null, source{kind,name,url,accessed,license_note}, dimension_provenance}
+scenario_id, created, example (bool)
+producer{repo, commit, code_commit, code_commit_exact, uncommitted_producer_files[], tool, data_revision}
+property{label, address|null, source{kind,name,url,accessed,license_note},
+         data_status: example_public_plan|synthetic|real_property_unverified|real_property_verified,
+         data_status_note, dimension_provenance}
 layouts{
   before{description, evidence[]}
   after{description, rooms[{layout_file, rooms[{name, modelled_*_ft, published_dimensions|null,
@@ -48,6 +51,12 @@ Validator without dependencies: `python3 scenario_tools.py scenarios/<file>.json
 - `resale_scenario.status = not_evaluated` forces the value fields to null; `draft`
   or `reviewed` requires at least one comp with provenance.
 - Fields named `guaranteed_value`, `expected_profit` or `roi` are rejected.
+- `example` must agree with `property.data_status` (true for `example_public_plan` and
+  `synthetic`); `real_property_verified` requires `dimension_provenance: owner_measured`.
+- `producer.commit` is the producer **code** revision (`code_commit` repeats it;
+  `code_commit_exact: false` lists producer files with uncommitted edits at generation).
+  The **data** revision is the commit containing the scenario file, read from git history.
+  See `HOUSING_MAPPING_NOTE_0.1.md`.
 - Disclaimers must say the resale block is not a valuation or guarantee.
 
 ## Feasibility for the Housing dashboard (read-only integration)

@@ -2,10 +2,18 @@
   "contract_version": "0.1",
   "scenario_id": "houseplans-430-40-offline-001",
   "created": "2026-09-21",
+  "example": true,
   "producer": {
     "repo": "brax1227/AI_Interior_Designer",
-    "commit": "cd9c190",
-    "tool": "scenario_tools.py"
+    "commit": "897a34c",
+    "code_commit": "897a34c",
+    "code_commit_exact": false,
+    "uncommitted_producer_files": [
+      "contracts/property_design_scenario.schema.json",
+      "scenario_tools.py"
+    ],
+    "tool": "scenario_tools.py",
+    "data_revision": "the git commit that contains this scenario file (git log -- scenarios/<file>); not knowable at generation time"
   },
   "property": {
     "label": "Houseplans.com plan 430-40, two rooms (not an Auburn property)",
@@ -17,6 +25,8 @@
       "accessed": "2026-09-21",
       "license_note": "Published numeric room dimensions reused as facts with attribution; designer credit not stated as text on the page; no drawings copied."
     },
+    "data_status": "example_public_plan",
+    "data_status_note": "Example built from a public stock plan, not a real, located, or measured property. Room widths/depths (Master Bedroom 12' 2\" x 14', Great Room 15' x 15') are published facts from Houseplans.com plan 430-40, accessed 2026-09-21 and independently confirmed by the PM. Door/window positions, furniture, every cost figure and the resale block are assumptions or unverified internal-catalog values; see per-room dimension_provenance/openings_provenance and per-item provenance. Importers must not treat this scenario as a verified property.",
     "dimension_provenance": "mixed"
   },
   "layouts": {
